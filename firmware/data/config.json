@@ -1,0 +1,26 @@
+{
+  "meter_id": "METER_001",
+  "collector_url": "http://192.168.1.100:8000/api/readings",
+  "collection_interval": 60,
+  "wifi": {
+    "ssid": "YourWiFiSSID",
+    "password": "YourWiFiPassword"
+  },
+  "modbus": {
+    "type": "RTU",
+    "baudrate": 9600,
+    "slave_id": 1,
+    "host": "",
+    "port": 502,
+    "registers": {
+      "voltage": 0,
+      "current": 6,
+      "active_power": 12,
+      "reactive_power": 18,
+      "apparent_power": 24,
+      "power_factor": 30,
+      "frequency": 36,
+      "energy": 42
+    }
+  }
+}
