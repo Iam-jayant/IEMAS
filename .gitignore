@@ -1,4 +1,65 @@
+# Kiro AI IDE
 .kiro
+
+# Documentation (will be pushed separately)
+docs/
+
+# Dependencies
+node_modules/
 /node_modules
+
+# Environment Variables (NEVER COMMIT THESE)
 .env
-.vscode
+.env.local
+.env.*.local
+*.env
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
