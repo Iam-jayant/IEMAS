@@ -20,13 +20,10 @@ async def health_check(db: AsyncSession = Depends(get_db)):
     """
     health_data = {
         "status": "healthy",
-        "timestamp": datetime.utcnow(),
+        "service": "iemas-backend",
         "version": "1.0.0",
-        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
-        "database": {
-            "connected": False,
-            "message": ""
-        }
+        "timestamp": datetime.utcnow(),
+        "database_connected": False
     }
     
     # Check database connectivity
@@ -34,12 +31,10 @@ async def health_check(db: AsyncSession = Depends(get_db)):
         # Try to execute a simple query
         result = await db.execute(text("SELECT 1"))
         result.scalar()
-        health_data["database"]["connected"] = True
-        health_data["database"]["message"] = "Database connection successful"
+        health_data["database_connected"] = True
     except Exception as e:
         health_data["status"] = "unhealthy"
-        health_data["database"]["connected"] = False
-        health_data["database"]["message"] = f"Database connection failed: {str(e)}"
+        health_data["database_connected"] = False
         
         # Return 503 Service Unavailable if database is down
         return HealthCheckResponse(**health_data)
