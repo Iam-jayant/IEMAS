@@ -28,6 +28,7 @@ MOCK_METERS = [
         "name": "Main Building Meter",
         "location": "Building A - Floor 1",
         "created_at": "2024-01-15T10:00:00",
+        "updated_at": "2024-01-15T10:00:00",
         "modbus_config": {
             "type": "RTU",
             "baudrate": 9600,
@@ -40,6 +41,7 @@ MOCK_METERS = [
         "name": "Production Line 1",
         "location": "Factory - Section A",
         "created_at": "2024-01-16T14:30:00",
+        "updated_at": "2024-01-16T14:30:00",
         "modbus_config": {
             "type": "RTU",
             "baudrate": 9600,
@@ -52,6 +54,7 @@ MOCK_METERS = [
         "name": "HVAC System Meter",
         "location": "Building B - Rooftop",
         "created_at": "2024-01-17T09:15:00",
+        "updated_at": "2024-01-17T09:15:00",
         "modbus_config": {
             "type": "RTU",
             "baudrate": 9600,

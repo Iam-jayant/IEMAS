@@ -5,9 +5,10 @@ Endpoints for alert management, history, and actions
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.database import get_db
+from app.config import settings
 from app.models.schemas import (
     AlertResponse,
     AlertAcknowledge,
@@ -19,6 +20,58 @@ from app.services.alert_service import AlertService
 from app.auth import get_current_user
 
 router = APIRouter()
+
+# Mock data for DEV_MODE
+def get_mock_alerts():
+    """Generate mock alerts for DEV_MODE"""
+    now = datetime.utcnow()
+    return [
+        {
+            "id": 1,
+            "meter_id": "METER002",
+            "alert_type": "HIGH_POWER",
+            "measured_value": 5.2,
+            "threshold_value": 5.0,
+            "timestamp": (now - timedelta(minutes=10)).isoformat(),
+            "acknowledged": False,
+            "acknowledged_at": None,
+            "acknowledged_by": None,
+            "dismissed": False,
+            "dismissed_at": None,
+            "dismissed_by": None,
+            "created_at": (now - timedelta(minutes=10)).isoformat()
+        },
+        {
+            "id": 2,
+            "meter_id": "METER001",
+            "alert_type": "LOW_POWER_FACTOR",
+            "measured_value": 0.75,
+            "threshold_value": 0.80,
+            "timestamp": (now - timedelta(hours=2)).isoformat(),
+            "acknowledged": True,
+            "acknowledged_at": (now - timedelta(hours=1, minutes=30)).isoformat(),
+            "acknowledged_by": "admin@example.com",
+            "dismissed": False,
+            "dismissed_at": None,
+            "dismissed_by": None,
+            "created_at": (now - timedelta(hours=2)).isoformat()
+        },
+        {
+            "id": 3,
+            "meter_id": "METER003",
+            "alert_type": "HIGH_POWER",
+            "measured_value": 2.5,
+            "threshold_value": 2.0,
+            "timestamp": (now - timedelta(days=1)).isoformat(),
+            "acknowledged": True,
+            "acknowledged_at": (now - timedelta(days=1)).isoformat(),
+            "acknowledged_by": "operator@example.com",
+            "dismissed": True,
+            "dismissed_at": (now - timedelta(hours=12)).isoformat(),
+            "dismissed_by": "admin@example.com",
+            "created_at": (now - timedelta(days=1)).isoformat()
+        }
+    ]
 
 
 @router.get("/",
@@ -48,6 +101,15 @@ async def get_alerts(
     Requirements: 5.4, 9.4
     """
     try:
+        # DEV_MODE: Return mock data
+        if settings.DEV_MODE:
+            alerts = get_mock_alerts()
+            if meter_id:
+                alerts = [a for a in alerts if a["meter_id"] == meter_id]
+            if active_only:
+                alerts = [a for a in alerts if not a["dismissed"]]
+            return alerts[:limit]
+        
         # Validate limit
         if limit > 1000:
             limit = 1000
