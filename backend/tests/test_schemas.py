@@ -8,25 +8,23 @@ import pytest
 from datetime import datetime
 from pydantic import ValidationError
 from app.models.schemas import (
-    MeterReading,
+    MeterReadingCreate,
     MeterRegistration,
     MeterUpdate,
     ThresholdConfig,
-    ThresholdUpdate,
-    Alert,
+    AlertCreate,
     AlertAcknowledge,
     AlertDismiss,
-    MeterStatus,
-    HealthCheck,
+    HealthCheckResponse,
 )
 
 
-class TestMeterReading:
-    """Test MeterReading model validations."""
+class TestMeterReadingCreate:
+    """Test MeterReadingCreate model validations."""
     
     def test_valid_meter_reading(self):
         """Test that a valid meter reading is accepted."""
-        reading = MeterReading(
+        reading = MeterReadingCreate(
             meter_id="METER_001",
             timestamp=datetime(2024, 1, 15, 10, 30, 0),
             voltage=230.5,
@@ -49,7 +47,7 @@ class TestMeterReading:
     def test_voltage_out_of_range_high(self):
         """Test that voltage > 1000V is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=1500.0,  # Invalid: > 1000V
@@ -67,7 +65,7 @@ class TestMeterReading:
     def test_voltage_negative(self):
         """Test that negative voltage is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=-10.0,  # Invalid: negative
@@ -85,7 +83,7 @@ class TestMeterReading:
     def test_current_negative(self):
         """Test that negative current is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -103,7 +101,7 @@ class TestMeterReading:
     def test_power_factor_out_of_range_high(self):
         """Test that power factor > 1 is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -121,7 +119,7 @@ class TestMeterReading:
     def test_power_factor_out_of_range_low(self):
         """Test that power factor < -1 is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -139,7 +137,7 @@ class TestMeterReading:
     def test_frequency_out_of_range(self):
         """Test that frequency > 100Hz is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -157,7 +155,7 @@ class TestMeterReading:
     def test_frequency_negative(self):
         """Test that negative frequency is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="METER_001",
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -174,7 +172,7 @@ class TestMeterReading:
     
     def test_meter_reading_with_optional_fields(self):
         """Test meter reading without optional firmware fields."""
-        reading = MeterReading(
+        reading = MeterReadingCreate(
             meter_id="METER_001",
             timestamp=datetime.now(),
             voltage=230.0,
@@ -193,7 +191,7 @@ class TestMeterReading:
     def test_empty_meter_id_rejected(self):
         """Test that empty meter_id is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            MeterReading(
+            MeterReadingCreate(
                 meter_id="",  # Invalid: empty
                 timestamp=datetime.now(),
                 voltage=230.0,
@@ -494,3 +492,6 @@ class TestThresholdUpdate:
             ThresholdUpdate(low_power_factor_threshold=1.5)  # Invalid: > 1
         
         assert "low_power_factor_threshold" in str(exc_info.value)
+
+
+
