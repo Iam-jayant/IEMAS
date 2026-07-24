@@ -38,15 +38,6 @@ export default function DashboardLayout({
         setIsLoading(false);
         return;
       }
-
-      // Production auth (disabled for now)
-      // const supabase = createClient();
-      // const { data: { session } } = await supabase.auth.getSession();
-      // if (!session) {
-      //   router.push('/login');
-      //   return;
-      // }
-      // setUser(session.user);
       setIsLoading(false);
     };
 
@@ -58,10 +49,6 @@ export default function DashboardLayout({
       console.log('Dev mode: Logout disabled');
       return;
     }
-    
-    // Production logout
-    // const supabase = createClient();
-    // await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
   };
@@ -69,6 +56,7 @@ export default function DashboardLayout({
   const navItems = [
     { name: 'Meters', href: '/meters', icon: Gauge },
     { name: 'Alerts', href: '/alerts', icon: Bell },
+    { name: 'Historical Data', href: '/historical', icon: Activity },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'AI Assistant', href: '/ai-assistant', icon: MessageSquare },
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -76,14 +64,14 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-bg flex items-center justify-center font-sans">
+        <div className="text-text-3 font-mono text-xs uppercase tracking-widest animate-pulse">Initializing System...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-bg flex font-sans selection:bg-teal-accent/20 selection:text-teal-accent">
       {/* Alert Notification - Fixed top-right position across all dashboard pages */}
       <AlertNotification />
       
@@ -91,26 +79,29 @@ export default function DashboardLayout({
       <aside
         className={`${
           isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-[#111827] border-r border-gray-800 transition-all duration-300 flex flex-col`}
+        } bg-surface border-r border-border transition-all duration-300 flex flex-col`}
       >
         {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-border">
           {isSidebarOpen && (
-            <div>
-              <h1 className="text-white font-bold text-lg">IEMAS</h1>
-              <p className="text-gray-400 text-xs">v1.0.0 {DEV_MODE && '(DEV)'}</p>
+            <div className="flex items-center gap-2 pl-2">
+              <span className="w-2 h-2 rounded-full bg-teal-accent animate-pulse" />
+              <div>
+                <h1 className="text-text-1 font-bold font-display text-base tracking-tight leading-none">IEMAS</h1>
+                <span className="text-text-3 font-mono text-[9px] font-bold uppercase tracking-wider">v1.0.0 {DEV_MODE && '(DEV)'}</span>
+              </div>
             </div>
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-gray-800 rounded text-gray-400 hover:text-white transition-colors"
+            className="p-2 hover:bg-surface-2 rounded-xl text-text-3 hover:text-text-1 transition-colors cursor-pointer"
           >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 overflow-y-auto">
+        <nav className="flex-1 py-4 overflow-y-auto space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname?.startsWith(item.href);
@@ -119,27 +110,27 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 ${
+                className={`flex items-center gap-3 px-4 py-3 border-l-4 transition-all duration-200 ${
                   isActive
-                    ? 'bg-[#019CDF]/10 text-[#019CDF] border-l-4 border-[#019CDF]'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white border-l-4 border-transparent'
-                } transition-colors`}
+                    ? 'bg-teal-accent/5 text-teal-accent border-teal-accent font-semibold font-mono text-xs uppercase tracking-wider'
+                    : 'text-text-2 hover:bg-surface-2 hover:text-text-1 border-transparent text-xs font-semibold'
+                }`}
               >
-                <Icon size={20} />
-                {isSidebarOpen && <span className="font-medium">{item.name}</span>}
+                <Icon size={18} className={isActive ? 'text-teal-accent' : 'text-text-3'} />
+                {isSidebarOpen && <span>{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
         {/* User Section */}
-        <div className="border-t border-gray-800 p-4">
+        <div className="border-t border-border p-4 bg-surface-2/40">
           {isSidebarOpen ? (
-            <div className="mb-3">
-              <p className="text-white text-sm font-medium truncate">
-                {user?.email || 'Development User'}
+            <div className="mb-3 pl-1">
+              <p className="text-text-1 text-xs font-bold truncate font-mono">
+                {user?.email || 'dev@iemas.local'}
               </p>
-              <p className="text-gray-400 text-xs">Energy Engineer</p>
+              <p className="text-text-3 text-[10px] uppercase font-bold tracking-wider font-mono mt-0.5">Energy Engineer</p>
             </div>
           ) : null}
           
@@ -147,12 +138,12 @@ export default function DashboardLayout({
             onClick={handleLogout}
             className={`flex items-center gap-3 ${
               isSidebarOpen ? 'w-full' : ''
-            } px-3 py-2 text-gray-400 hover:bg-red-900/20 hover:text-red-400 rounded transition-colors ${
-              DEV_MODE ? 'opacity-50 cursor-not-allowed' : ''
+            } px-3 py-2 text-text-3 hover:bg-red-accent/10 hover:text-red-accent rounded-xl transition-colors font-mono text-xs uppercase font-bold tracking-wider ${
+              DEV_MODE ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
             }`}
             disabled={DEV_MODE}
           >
-            <LogOut size={20} />
+            <LogOut size={16} />
             {isSidebarOpen && <span>Sign Out</span>}
           </button>
         </div>
@@ -161,9 +152,9 @@ export default function DashboardLayout({
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+        <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-md font-bold font-display text-text-1 uppercase tracking-wider">
               {navItems.find((item) => pathname?.startsWith(item.href))?.name || 'Dashboard'}
             </h2>
           </div>
@@ -171,27 +162,28 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
             {/* Dev Mode Indicator */}
             {DEV_MODE && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">
-                🔧 DEV MODE
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-accent/5 text-amber-accent border border-amber-accent/20 rounded-full font-mono text-[9px] font-bold tracking-wider select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-accent animate-ping" />
+                DEV MODE
               </div>
             )}
             
             {/* Status Indicator */}
-            <div className="flex items-center gap-2">
-              <Activity className="text-green-500" size={16} />
-              <span className="text-sm text-gray-600">System Online</span>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-teal-accent/5 text-teal-accent border border-teal-accent/20 rounded-full font-mono text-[9px] font-bold tracking-wider select-none">
+              <Activity className="animate-pulse" size={12} />
+              <span>SYSTEM ONLINE</span>
             </div>
 
             {/* Notification Badge */}
-            <button className="relative p-2 hover:bg-gray-100 rounded-full">
-              <Bell size={20} className="text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <button className="relative p-2 hover:bg-surface-2 rounded-xl text-text-2 hover:text-text-1 transition-colors cursor-pointer border border-border">
+              <Bell size={16} />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-accent rounded-full"></span>
             </button>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-6 bg-bg">
           {children}
         </div>
       </main>
