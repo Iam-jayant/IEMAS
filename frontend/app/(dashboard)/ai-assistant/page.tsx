@@ -3,16 +3,15 @@ import AIChat from '@/components/AIChat';
 /**
  * IEMAS - AI Assistant Page
  * 
- * Natural language query interface for energy monitoring system.
- * Users can ask questions about meter data, trends, and analytics.
+ * Gemini-style natural language query interface for energy monitoring.
+ * Features a centered welcome screen with suggestion chips that transitions
+ * into a conversational chat view.
  */
 
 export default function AIAssistantPage() {
   return (
-    <div className="h-[calc(100vh-4rem)]">
-      <div className="h-full max-w-4xl mx-auto">
-        <AIChat />
-      </div>
+    <div className="h-[calc(100vh-4rem)] overflow-hidden">
+      <AIChat />
     </div>
   );
 }
