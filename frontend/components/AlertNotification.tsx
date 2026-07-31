@@ -39,7 +39,7 @@ interface AlertDisplayItem extends Alert {
  * ```
  */
 export default function AlertNotification() {
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/alerts';
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000/ws/alerts';
   const { alerts: wsAlerts, isConnected } = useWebSocket(wsUrl);
   
   const [displayAlerts, setDisplayAlerts] = useState<AlertDisplayItem[]>([]);
