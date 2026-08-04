@@ -98,7 +98,17 @@ export default function MeterDetailPage() {
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
       
-      setHistoricalData(sortedReadings);
+
+      // Downsample data if too dense (max 500 points for charts)
+      let displayReadings = sortedReadings;
+      const MAX_POINTS = 500;
+      if (displayReadings.length > MAX_POINTS) {
+        const step = Math.ceil(displayReadings.length / MAX_POINTS);
+        displayReadings = displayReadings.filter((_: any, i: number) => i % step === 0);
+      }
+      
+      setHistoricalData(displayReadings);
+
     } catch (err: any) {
       setError(err.message || 'Failed to load meter data');
     } finally {
