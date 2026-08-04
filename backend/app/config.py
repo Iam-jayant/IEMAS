@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # Development Mode
-    DEV_MODE: bool = os.getenv("DEV_MODE", "false").lower() == "true"
+    DEV_MODE: bool = False
     
     # Supabase Configuration
     SUPABASE_URL: str = ""

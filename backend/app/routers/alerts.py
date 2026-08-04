@@ -118,7 +118,7 @@ async def get_alerts(
         
         if active_only:
             # Get only active (non-dismissed) alerts
-            alerts = await alert_service.get_active_alerts(meter_id)
+            alerts = alert_service.get_active_alerts(meter_id)
             
             # Apply time filters if provided
             if start_time:
@@ -130,7 +130,7 @@ async def get_alerts(
             alerts = alerts[:limit]
         else:
             # Get full alert history
-            alerts = await alert_service.get_alert_history(
+            alerts = alert_service.get_alert_history(
                 meter_id=meter_id,
                 start_time=start_time,
                 end_time=end_time,
@@ -166,7 +166,7 @@ async def get_active_alerts(
     """
     try:
         alert_service = AlertService(db)
-        alerts = await alert_service.get_active_alerts(meter_id)
+        alerts = alert_service.get_active_alerts(meter_id)
         return alerts
         
     except Exception as e:
@@ -242,7 +242,7 @@ async def acknowledge_alert(
         alert_service = AlertService(db)
         user_id = user.get("id")
         
-        alert = await alert_service.acknowledge_alert(alert_id, user_id)
+        alert = alert_service.acknowledge_alert(alert_id, user_id)
         
         if not alert:
             raise HTTPException(
@@ -293,7 +293,7 @@ async def dismiss_alert(
         alert_service = AlertService(db)
         user_id = user.get("id")
         
-        alert = await alert_service.dismiss_alert(alert_id, user_id)
+        alert = alert_service.dismiss_alert(alert_id, user_id)
         
         if not alert:
             raise HTTPException(

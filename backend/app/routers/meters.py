@@ -21,48 +21,6 @@ from app.auth import get_current_user
 
 router = APIRouter()
 
-# Mock data for DEV_MODE
-MOCK_METERS = [
-    {
-        "meter_id": "METER001",
-        "name": "Main Building Meter",
-        "location": "Building A - Floor 1",
-        "created_at": "2024-01-15T10:00:00",
-        "updated_at": "2024-01-15T10:00:00",
-        "modbus_config": {
-            "type": "RTU",
-            "baudrate": 9600,
-            "slave_id": 1,
-            "registers": {"voltage": 0, "current": 6, "power": 12}
-        }
-    },
-    {
-        "meter_id": "METER002",
-        "name": "Production Line 1",
-        "location": "Factory - Section A",
-        "created_at": "2024-01-16T14:30:00",
-        "updated_at": "2024-01-16T14:30:00",
-        "modbus_config": {
-            "type": "RTU",
-            "baudrate": 9600,
-            "slave_id": 2,
-            "registers": {"voltage": 0, "current": 6, "power": 12}
-        }
-    },
-    {
-        "meter_id": "METER003",
-        "name": "HVAC System Meter",
-        "location": "Building B - Rooftop",
-        "created_at": "2024-01-17T09:15:00",
-        "updated_at": "2024-01-17T09:15:00",
-        "modbus_config": {
-            "type": "RTU",
-            "baudrate": 9600,
-            "slave_id": 3,
-            "registers": {"voltage": 0, "current": 6, "power": 12}
-        }
-    }
-]
 
 
 @router.get("/",
@@ -83,10 +41,6 @@ async def list_meters(
     Requirements: 7.1, 7.2, 7.3, 9.3
     """
     try:
-        # DEV_MODE: Return mock data
-        if settings.DEV_MODE:
-            return MOCK_METERS
-        
         meters = db.query(Meter).all()
         return meters
     except Exception as e:

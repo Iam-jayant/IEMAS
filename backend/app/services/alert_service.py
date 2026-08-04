@@ -4,8 +4,7 @@ Evaluates meter readings against thresholds and generates alerts
 """
 from datetime import datetime
 from typing import List, Optional, Dict
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy.orm import Session
 from app.models.database import Alert, Threshold, MeterReading
 from app.models.schemas import MeterReadingCreate, AlertResponse
 import asyncio
@@ -14,7 +13,7 @@ import asyncio
 class AlertService:
     """Service for alert evaluation and management"""
     
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: Session):
         self.db = db
     
     async def evaluate_reading(self, reading: MeterReadingCreate, meter_id: str) -> List[AlertResponse]:
@@ -32,7 +31,7 @@ class AlertService:
         alerts_generated = []
         
         # Get thresholds for this meter
-        threshold = await self.get_threshold(meter_id)
+        threshold = self.get_threshold(meter_id)
         
         if not threshold:
             # No thresholds configured, skip evaluation
@@ -40,7 +39,7 @@ class AlertService:
         
         # Check high power threshold
         if reading.active_power > threshold.high_power_threshold:
-            alert = await self.create_alert(
+            alert = self.create_alert(
                 meter_id=meter_id,
                 alert_type="HIGH_POWER",
                 measured_value=reading.active_power,
@@ -51,7 +50,7 @@ class AlertService:
         
         # Check low power factor threshold
         if reading.power_factor < threshold.low_power_factor_threshold:
-            alert = await self.create_alert(
+            alert = self.create_alert(
                 meter_id=meter_id,
                 alert_type="LOW_POWER_FACTOR",
                 measured_value=reading.power_factor,
@@ -78,7 +77,7 @@ class AlertService:
         
         return alerts_generated
     
-    async def get_threshold(self, meter_id: str) -> Optional[Threshold]:
+    def get_threshold(self, meter_id: str) -> Optional[Threshold]:
         """
         Get threshold configuration for a specific meter
         
@@ -88,12 +87,9 @@ class AlertService:
         Returns:
             Threshold object or None if not configured
         """
-        result = await self.db.execute(
-            select(Threshold).where(Threshold.meter_id == meter_id)
-        )
-        return result.scalar_one_or_none()
+        return self.db.query(Threshold).filter(Threshold.meter_id == meter_id).first()
     
-    async def create_alert(
+    def create_alert(
         self,
         meter_id: str,
         alert_type: str,
@@ -125,12 +121,12 @@ class AlertService:
         )
         
         self.db.add(alert)
-        await self.db.commit()
-        await self.db.refresh(alert)
+        self.db.commit()
+        self.db.refresh(alert)
         
         return AlertResponse.model_validate(alert)
     
-    async def get_active_alerts(self, meter_id: Optional[str] = None) -> List[AlertResponse]:
+    def get_active_alerts(self, meter_id: Optional[str] = None) -> List[AlertResponse]:
         """
         Get all active (non-dismissed) alerts
         
@@ -140,19 +136,18 @@ class AlertService:
         Returns:
             List of active alerts
         """
-        query = select(Alert).where(Alert.dismissed == False)
+        query = self.db.query(Alert).filter(Alert.dismissed == False)
         
         if meter_id:
-            query = query.where(Alert.meter_id == meter_id)
+            query = query.filter(Alert.meter_id == meter_id)
         
         query = query.order_by(Alert.timestamp.desc())
         
-        result = await self.db.execute(query)
-        alerts = result.scalars().all()
+        alerts = query.all()
         
         return [AlertResponse.model_validate(alert) for alert in alerts]
     
-    async def get_alert_history(
+    def get_alert_history(
         self,
         meter_id: Optional[str] = None,
         start_time: Optional[datetime] = None,
@@ -171,27 +166,22 @@ class AlertService:
         Returns:
             List of alerts matching filters
         """
-        query = select(Alert)
+        query = self.db.query(Alert)
         
-        conditions = []
         if meter_id:
-            conditions.append(Alert.meter_id == meter_id)
+            query = query.filter(Alert.meter_id == meter_id)
         if start_time:
-            conditions.append(Alert.timestamp >= start_time)
+            query = query.filter(Alert.timestamp >= start_time)
         if end_time:
-            conditions.append(Alert.timestamp <= end_time)
-        
-        if conditions:
-            query = query.where(and_(*conditions))
+            query = query.filter(Alert.timestamp <= end_time)
         
         query = query.order_by(Alert.timestamp.desc()).limit(limit)
         
-        result = await self.db.execute(query)
-        alerts = result.scalars().all()
+        alerts = query.all()
         
         return [AlertResponse.model_validate(alert) for alert in alerts]
     
-    async def acknowledge_alert(self, alert_id: int, user_id: str) -> Optional[AlertResponse]:
+    def acknowledge_alert(self, alert_id: int, user_id: str) -> Optional[AlertResponse]:
         """
         Acknowledge an alert
         
@@ -202,10 +192,7 @@ class AlertService:
         Returns:
             Updated alert or None if not found
         """
-        result = await self.db.execute(
-            select(Alert).where(Alert.id == alert_id)
-        )
-        alert = result.scalar_one_or_none()
+        alert = self.db.query(Alert).filter(Alert.id == alert_id).first()
         
         if not alert:
             return None
@@ -214,12 +201,12 @@ class AlertService:
         alert.acknowledged_at = datetime.utcnow()
         alert.acknowledged_by = user_id
         
-        await self.db.commit()
-        await self.db.refresh(alert)
+        self.db.commit()
+        self.db.refresh(alert)
         
         return AlertResponse.model_validate(alert)
     
-    async def dismiss_alert(self, alert_id: int, user_id: str) -> Optional[AlertResponse]:
+    def dismiss_alert(self, alert_id: int, user_id: str) -> Optional[AlertResponse]:
         """
         Dismiss an alert
         
@@ -230,10 +217,7 @@ class AlertService:
         Returns:
             Updated alert or None if not found
         """
-        result = await self.db.execute(
-            select(Alert).where(Alert.id == alert_id)
-        )
-        alert = result.scalar_one_or_none()
+        alert = self.db.query(Alert).filter(Alert.id == alert_id).first()
         
         if not alert:
             return None
@@ -242,12 +226,12 @@ class AlertService:
         alert.dismissed_at = datetime.utcnow()
         alert.dismissed_by = user_id
         
-        await self.db.commit()
-        await self.db.refresh(alert)
+        self.db.commit()
+        self.db.refresh(alert)
         
         return AlertResponse.model_validate(alert)
     
-    async def update_threshold(
+    def update_threshold(
         self,
         meter_id: str,
         high_power_threshold: Optional[float] = None,
@@ -264,10 +248,7 @@ class AlertService:
         Returns:
             Updated or created threshold object
         """
-        result = await self.db.execute(
-            select(Threshold).where(Threshold.meter_id == meter_id)
-        )
-        threshold = result.scalar_one_or_none()
+        threshold = self.db.query(Threshold).filter(Threshold.meter_id == meter_id).first()
         
         if threshold:
             # Update existing threshold
@@ -285,7 +266,7 @@ class AlertService:
             )
             self.db.add(threshold)
         
-        await self.db.commit()
-        await self.db.refresh(threshold)
+        self.db.commit()
+        self.db.refresh(threshold)
         
         return threshold

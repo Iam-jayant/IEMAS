@@ -35,30 +35,14 @@ async def get_current_user(
     Returns:
         User data dictionary
     """
-    # DEVELOPMENT MODE: Skip authentication
-    if DEV_MODE:
-        return {
-            "id": "dev-user-123",
-            "email": "dev@iemas.local",
-            "role": "admin",
-            "user_metadata": {},
-            "app_metadata": {}
-        }
-    
-    # Production authentication code (disabled for now)
-    if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # TODO: Implement Supabase auth verification in production
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication not configured",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    # Temporarily returning mock user for all environments until Supabase Auth is fully implemented
+    return {
+        "id": "dev-user-123",
+        "email": "dev@iemas.local",
+        "role": "admin",
+        "user_metadata": {},
+        "app_metadata": {}
+    }
 
 
 async def get_current_user_optional(

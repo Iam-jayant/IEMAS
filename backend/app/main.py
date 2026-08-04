@@ -9,7 +9,7 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -71,3 +71,7 @@ app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+# trigger reload
+
+# trigger reload 2

@@ -26,64 +26,6 @@ from app.auth import get_current_user
 
 router = APIRouter()
 
-# Mock data for DEV_MODE
-def get_mock_latest_readings():
-    """Generate mock latest readings for DEV_MODE"""
-    now = datetime.utcnow()
-    created = now - timedelta(days=30)
-    return [
-        {
-            "id": 1,
-            "meter_id": "METER001",
-            "timestamp": (now - timedelta(seconds=30)).isoformat(),
-            "voltage": 230.5,
-            "current": 15.2,
-            "active_power": 3.5,
-            "reactive_power": 0.8,
-            "apparent_power": 3.6,
-            "power_factor": 0.97,
-            "frequency": 50.1,
-            "cumulative_energy": 1250.4,
-            "firmware_version": "v1.2.0",
-            "uptime_seconds": 86400,
-            "wifi_rssi": -45,
-            "created_at": created.isoformat()
-        },
-        {
-            "id": 2,
-            "meter_id": "METER002",
-            "timestamp": (now - timedelta(seconds=45)).isoformat(),
-            "voltage": 228.3,
-            "current": 22.8,
-            "active_power": 5.2,
-            "reactive_power": 1.2,
-            "apparent_power": 5.3,
-            "power_factor": 0.98,
-            "frequency": 50.0,
-            "cumulative_energy": 3450.7,
-            "firmware_version": "v1.2.0",
-            "uptime_seconds": 172800,
-            "wifi_rssi": -52,
-            "created_at": created.isoformat()
-        },
-        {
-            "id": 3,
-            "meter_id": "METER003",
-            "timestamp": (now - timedelta(seconds=60)).isoformat(),
-            "voltage": 232.1,
-            "current": 8.5,
-            "active_power": 2.0,
-            "reactive_power": 0.3,
-            "apparent_power": 2.0,
-            "power_factor": 0.99,
-            "frequency": 49.9,
-            "cumulative_energy": 890.2,
-            "firmware_version": "v1.1.5",
-            "uptime_seconds": 259200,
-            "wifi_rssi": -68,
-            "created_at": created.isoformat()
-        }
-    ]
 
 
 @router.post("/", 
@@ -119,6 +61,47 @@ async def create_reading(
     Requirements: 1.2, 1.4, 1.5, 1.6, 9.6, 9.7, 9.8, 10.5
     """
     try:
+        if settings.DEV_MODE:
+            # Handle DEV_MODE in-memory storage
+            import random
+            reading_dict = reading.model_dump()
+            # Ensure timestamp is a string in ISO format for JSON serialization
+            if hasattr(reading.timestamp, "isoformat"):
+                reading_dict["timestamp"] = reading.timestamp.isoformat()
+            
+            reading_dict["id"] = random.randint(1000, 9999)
+            reading_dict["created_at"] = datetime.utcnow().isoformat()
+            
+            # Update in-memory store
+            MOCK_READINGS_STORE[reading.meter_id] = reading_dict
+            
+            # Occasionally broadcast a fake alert to test WebSocket flow
+            if random.random() < 0.1:  # 10% chance to generate an alert
+                from app.websocket import broadcast_alert_to_clients
+                import asyncio
+                alert_data = {
+                    "id": random.randint(1, 1000),
+                    "meter_id": reading.meter_id,
+                    "alert_type": "HIGH_POWER" if random.random() > 0.5 else "LOW_POWER_FACTOR",
+                    "measured_value": reading.active_power if random.random() > 0.5 else reading.power_factor,
+                    "threshold_value": 1000.0 if reading.active_power > 100 else 0.8,
+                    "timestamp": reading_dict["timestamp"]
+                }
+                
+                # We need to run the async broadcast function since we are in a sync/async boundary
+                # add_task will schedule the coroutine to run in the background
+                background_tasks.add_task(broadcast_alert_to_clients, alert_data)
+            
+            return APIResponse(
+                status="success",
+                message="Meter reading stored successfully (DEV_MODE)",
+                data={
+                    "reading_id": reading_dict["id"],
+                    "meter_id": reading.meter_id,
+                    "timestamp": reading_dict["timestamp"]
+                }
+            )
+
         # Check if meter is registered (Requirement 1.4)
         meter = db.query(Meter).filter(Meter.meter_id == reading.meter_id).first()
         if not meter:
@@ -214,9 +197,11 @@ async def get_readings(
             query = query.filter(MeterReading.meter_id == meter_id)
         
         if start_time:
+            start_time = start_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp >= start_time)
         
         if end_time:
+            end_time = end_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp <= end_time)
         
         # Order by timestamp descending and apply limit
@@ -249,10 +234,6 @@ async def get_latest_readings(
     Requirements: 4.1, 9.2
     """
     try:
-        # DEV_MODE: Return mock data
-        if settings.DEV_MODE:
-            return get_mock_latest_readings()
-        
         # Get all meters
         meters = db.query(Meter).all()
         
@@ -346,9 +327,11 @@ async def export_readings_csv(
             query = query.filter(MeterReading.meter_id == meter_id)
         
         if start_time:
+            start_time = start_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp >= start_time)
         
         if end_time:
+            end_time = end_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp <= end_time)
         
         # Order by timestamp descending and apply limit
@@ -443,9 +426,11 @@ async def export_readings_json(
             query = query.filter(MeterReading.meter_id == meter_id)
         
         if start_time:
+            start_time = start_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp >= start_time)
         
         if end_time:
+            end_time = end_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp <= end_time)
         
         # Order by timestamp descending and apply limit
