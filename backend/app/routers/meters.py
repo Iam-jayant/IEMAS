@@ -23,7 +23,7 @@ router = APIRouter()
 
 
 
-@router.get("/",
+@router.get("",
     response_model=List[MeterResponse],
     responses={
         500: {"model": ErrorResponse, "description": "Internal server error"}
@@ -88,7 +88,7 @@ async def get_meter(
         )
 
 
-@router.post("/",
+@router.post("",
     status_code=status.HTTP_201_CREATED,
     response_model=MeterResponse,
     responses={
