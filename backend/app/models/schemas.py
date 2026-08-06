@@ -3,7 +3,7 @@ IEMAS Backend - Pydantic Data Models
 Data validation schemas for API requests and responses
 """
 from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 
@@ -48,6 +48,13 @@ class MeterReadingResponse(MeterReadingCreate):
     id: int = Field(..., description="Database record ID")
     created_at: datetime = Field(..., description="Record creation timestamp")
 
+    @field_validator('timestamp', 'created_at', mode='after', check_fields=False)
+    @classmethod
+    def ensure_tz(cls, v: datetime) -> datetime:
+        if v and v.tzinfo is None:
+            return v.replace(tzinfo=timezone.utc)
+        return v
+
     class Config:
         from_attributes = True
 
@@ -91,6 +98,13 @@ class MeterResponse(MeterRegistration):
     """Schema for meter response (includes timestamps)"""
     created_at: datetime = Field(..., description="Meter registration timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
+
+    @field_validator('created_at', 'updated_at', mode='after', check_fields=False)
+    @classmethod
+    def ensure_tz(cls, v: datetime) -> datetime:
+        if v and v.tzinfo is None:
+            return v.replace(tzinfo=timezone.utc)
+        return v
 
     class Config:
         from_attributes = True
@@ -169,6 +183,13 @@ class AlertResponse(AlertCreate):
     dismissed_at: Optional[datetime] = Field(None, description="Dismissal timestamp")
     dismissed_by: Optional[str] = Field(None, description="User who dismissed")
     created_at: datetime = Field(..., description="Alert creation timestamp")
+
+    @field_validator('timestamp', 'created_at', 'acknowledged_at', 'dismissed_at', mode='after', check_fields=False)
+    @classmethod
+    def ensure_tz(cls, v: datetime) -> datetime:
+        if v and v.tzinfo is None:
+            return v.replace(tzinfo=timezone.utc)
+        return v
 
     class Config:
         from_attributes = True
