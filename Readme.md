@@ -7,9 +7,9 @@ IEMAS is an enterprise-grade Industrial IoT platform designed to monitor and ana
 ## Architecture
 
 ```
-Schneider Energy Meters (Modbus RTU/TCP)
+Schneider Energy Meters (Modbus RTU/TCP) / Realistic Meter Simulator
            ↓
-    ESP32 Devices (Edge Layer)
+    ESP32 Devices (Edge Layer) / Python HTTP Client
            ↓
     FastAPI Backend (Python)
            ↓
@@ -26,244 +26,132 @@ Schneider Energy Meters (Modbus RTU/TCP)
 - **Framework**: FastAPI (Python 3.11+)
 - **ORM**: SQLAlchemy
 - **Validation**: Pydantic
-- **Database**: Supabase PostgreSQL
-- **AI**: Google Gemini 2.5 Flash
+- **Database**: PostgreSQL (via Supabase or local asyncpg)
+- **AI**: Google Gemini AI
 
 ### Frontend
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16.2.9 (App Router with Turbopack)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS v4
 - **Data Fetching**: TanStack Query
-- **Charts**: Recharts
+- **Charts**: Recharts v3
 - **Icons**: Lucide React
 
-### Edge Devices
-- **Hardware**: ESP32 microcontrollers
-- **Communication**: Modbus RTU over RS485 (MAX3485)
-- **Protocol**: HTTP POST to backend API
+### Realistic Meter Simulator
+- **Core**: Python 3.11+ Modbus RTU/TCP Simulator Engine
+- **Features**: Electrical parameter models, machine operation cycles, HTTP sender
 
 ## Project Structure
 
 ```
 IEMAS/
-├── backend/              # FastAPI backend service
+├── backend/                    # FastAPI backend service
 │   ├── app/
-│   │   ├── main.py      # Application entry point
-│   │   ├── config.py    # Configuration management
-│   │   ├── database.py  # Database connection
-│   │   ├── models/      # Pydantic & SQLAlchemy models
-│   │   ├── routers/     # API route handlers
-│   │   └── services/    # Business logic
-│   ├── requirements.txt # Python dependencies
-│   ├── Dockerfile       # Backend containerization
-│   └── .env.example     # Environment variables template
+│   │   ├── main.py             # Application entry point
+│   │   ├── database.py         # Database connection
+│   │   ├── models/             # Pydantic & SQLAlchemy models
+│   │   └── routers/            # API route handlers
+│   └── requirements.txt        # Python dependencies
 │
-├── frontend/            # Next.js dashboard
-│   ├── app/            # App Router pages
-│   │   ├── (auth)/     # Authentication pages
-│   │   └── (dashboard)/# Dashboard pages
-│   ├── components/     # React components
-│   ├── lib/            # Utilities & API client
-│   ├── hooks/          # Custom React hooks
-│   ├── Dockerfile      # Frontend containerization
-│   └── .env.local.example
+├── frontend/                   # Next.js dashboard
+│   ├── app/                    # App Router pages
+│   ├── components/             # React components (RealtimeChart, Analytics, etc.)
+│   ├── lib/                    # API clients and utilities
+│   ├── hooks/                  # Custom React hooks
+│   └── package.json            # Node dependencies
 │
-├── firmware/           # ESP32 firmware (Arduino/ESP-IDF)
-│   └── README.md       # Firmware documentation
+├── realistic_meter_simulator/  # Python-based IoT sensor simulator
+│   ├── main.py                 # Simulator entry point
+│   ├── simulator.py            # Modbus / IoT device engine
+│   ├── electrical_parameters.py# Voltage/Current/Power logic
+│   └── simulator_config.json   # Simulation environment config
 │
-├── database/           # Database schema & migrations
-│   ├── schema.sql      # PostgreSQL schema
-│   ├── seed.sql        # Sample data
-│   └── README.md       # Database setup guide
-│
-├── docs/               # Documentation
-├── docker-compose.yml  # Multi-container orchestration
-└── README.md           # This file
+├── firmware/                   # ESP32 firmware (Arduino/ESP-IDF)
+├── database/                   # Database schema & migrations
+└── docker-compose.yml          # Multi-container orchestration
 ```
 
 ## Getting Started
 
-### Prerequisites
-
-- **Backend**: Python 3.11+, pip
-- **Frontend**: Node.js 20+, npm
-- **Database**: Supabase account (or local PostgreSQL)
-- **ESP32**: Arduino IDE or PlatformIO (for firmware development)
-
 ### 1. Database Setup
-
-1. Create a Supabase project at https://supabase.com
-2. Run the SQL schema:
-   ```bash
-   # Copy contents of database/schema.sql
-   # Paste and execute in Supabase SQL Editor
-   ```
-3. (Optional) Seed sample data:
-   ```bash
-   # Copy contents of database/seed.sql and execute
-   ```
+Create a PostgreSQL database (e.g. Supabase) and run the SQL schema located in `database/schema.sql`.
 
 ### 2. Backend Setup
 
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
 
 # Configure environment variables
 cp .env.example .env
-# Edit .env with your Supabase credentials and Gemini API key
+# Edit .env with your PostgreSQL credentials
 
 # Run development server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-
 Backend will be available at http://localhost:8000
 
 ### 3. Frontend Setup
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
 
-# Configure environment variables
-cp .env.local.example .env.local
-# Edit .env.local with your API URL and Supabase credentials
-
-# Run development server
+# Run development server with Turbopack
 npm run dev
 ```
-
 Frontend will be available at http://localhost:3000
 
-### 4. Docker Deployment (Optional)
+### 4. Running the Simulator
+To test the system locally without physical edge devices, you can use the Realistic Meter Simulator:
 
 ```bash
-# Build and run all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
+# In the project root:
+python -m realistic_meter_simulator.main
 ```
-
-## Environment Variables
-
-### Backend (.env)
-
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-GEMINI_API_KEY=your-gemini-api-key
-DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
-ENVIRONMENT=development
-LOG_LEVEL=INFO
-CORS_ORIGINS=http://localhost:3000
-```
-
-### Frontend (.env.local)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
+This will start generating simulated Modbus data and pushing it to the backend via HTTP.
 
 ## Features
 
 ### Real-Time Data Collection
-- Automatic meter readings every 1-2 minutes
-- ESP32 → FastAPI → Supabase pipeline
+- Automatic meter readings via Modbus / REST APIs
+- Full simulation suite for synthetic operational testing
 - Exponential backoff retry logic
-
-### Threshold-Based Alerts
-- High power consumption alerts
-- Low power factor warnings
-- Real-time WebSocket notifications
 
 ### AI-Powered Analytics
 - Natural language queries via Gemini AI
-- Energy trend analysis
+- Energy trend analysis and reporting
 - Peak consumption insights
-- Cost estimation
 
 ### Industrial UI Design
-- SCADA-inspired interface
-- Dark sidebar with light content area
+- Responsive SCADA-inspired interface
+- Real-time Recharts visualizations
 - High-contrast status indicators
-- Real-time charts and metrics
-
-### System Monitoring
-- Meter connection status
-- Backend service health
-- Database connectivity
-- ESP32 device metrics
 
 ## API Endpoints
 
-### Readings
-- `POST /api/readings` - Receive meter reading from ESP32
-- `GET /api/readings` - Get filtered readings
-- `GET /api/readings/latest` - Get latest reading per meter
-
-### Meters
-- `GET /api/meters` - List all meters
-- `POST /api/meters` - Register new meter
-- `PUT /api/meters/{id}` - Update meter
-- `DELETE /api/meters/{id}` - Delete meter
-
-### Alerts
-- `GET /api/alerts` - Get alert history
-- `POST /api/alerts/{id}/acknowledge` - Acknowledge alert
-- `POST /api/alerts/{id}/dismiss` - Dismiss alert
-
-### Thresholds
-- `GET /api/thresholds/{meter_id}` - Get thresholds
-- `PUT /api/thresholds/{meter_id}` - Update thresholds
-
-### AI
-- `POST /api/ai/query` - Submit natural language query
-
-### Health
-- `GET /api/health` - Health check
-
-## Performance Targets
-
-- **Data Collection**: 60-120 second intervals
-- **Database Storage**: <500ms per reading
-- **Alert Evaluation**: <200ms per reading
-- **Dashboard Updates**: <5 seconds from storage
-- **AI Query Response**: <10 seconds
+- `GET /api/readings` - Get filtered historical readings
+- `GET /api/readings/latest` - Get real-time latest reading per meter
+- `POST /api/readings` - Receive meter reading from Edge/Simulator
+- `GET /api/meters` - List all configured meters
 
 ## Development Roadmap
 
 - [x] Phase 1: Project scaffolding and infrastructure setup
-- [ ] Phase 2: Backend data models and API endpoints
-- [ ] Phase 3: Database integration and authentication
-- [ ] Phase 4: Alert system and WebSocket real-time updates
-- [ ] Phase 5: ESP32 firmware development
-- [ ] Phase 6: Frontend dashboard and authentication
-- [ ] Phase 7: Real-time meter visualization
-- [ ] Phase 8: Alert notification system
-- [ ] Phase 9: AI assistant integration
-- [ ] Phase 10: System monitoring dashboard
-- [ ] Phase 11: End-to-end integration and testing
-- [ ] Phase 12: Production deployment
+- [x] Phase 2: Backend data models and API endpoints
+- [x] Phase 3: Database integration and authentication
+- [x] Phase 4: Alert system and WebSocket real-time updates
+- [x] Phase 5: ESP32 firmware development (Simulated)
+- [x] Phase 6: Frontend dashboard and routing
+- [x] Phase 7: Real-time meter visualization
+- [x] Phase 8: Alert notification system
+- [x] Phase 9: AI assistant integration
+- [x] Phase 10: System monitoring dashboard
+- [x] Phase 11: End-to-end integration and testing
+- [x] Phase 12: Production deployment preparation
 
 ## License
 
 Proprietary - Industrial Energy Monitoring & Analytics System
-
-## Support
-
-For issues and questions, contact the development team.
