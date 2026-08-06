@@ -1,0 +1,5 @@
+{
+    "api_url": "http://localhost:8000/api/readings",
+    "interval_seconds": 60,
+    "alert_probability": 0.05
+}
