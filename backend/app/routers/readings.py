@@ -28,7 +28,7 @@ router = APIRouter()
 
 
 
-@router.post("/", 
+@router.post("", 
     status_code=status.HTTP_201_CREATED,
     response_model=APIResponse,
     responses={
@@ -61,46 +61,6 @@ async def create_reading(
     Requirements: 1.2, 1.4, 1.5, 1.6, 9.6, 9.7, 9.8, 10.5
     """
     try:
-        if settings.DEV_MODE:
-            # Handle DEV_MODE in-memory storage
-            import random
-            reading_dict = reading.model_dump()
-            # Ensure timestamp is a string in ISO format for JSON serialization
-            if hasattr(reading.timestamp, "isoformat"):
-                reading_dict["timestamp"] = reading.timestamp.isoformat()
-            
-            reading_dict["id"] = random.randint(1000, 9999)
-            reading_dict["created_at"] = datetime.utcnow().isoformat()
-            
-            # Update in-memory store
-            MOCK_READINGS_STORE[reading.meter_id] = reading_dict
-            
-            # Occasionally broadcast a fake alert to test WebSocket flow
-            if random.random() < 0.1:  # 10% chance to generate an alert
-                from app.websocket import broadcast_alert_to_clients
-                import asyncio
-                alert_data = {
-                    "id": random.randint(1, 1000),
-                    "meter_id": reading.meter_id,
-                    "alert_type": "HIGH_POWER" if random.random() > 0.5 else "LOW_POWER_FACTOR",
-                    "measured_value": reading.active_power if random.random() > 0.5 else reading.power_factor,
-                    "threshold_value": 1000.0 if reading.active_power > 100 else 0.8,
-                    "timestamp": reading_dict["timestamp"]
-                }
-                
-                # We need to run the async broadcast function since we are in a sync/async boundary
-                # add_task will schedule the coroutine to run in the background
-                background_tasks.add_task(broadcast_alert_to_clients, alert_data)
-            
-            return APIResponse(
-                status="success",
-                message="Meter reading stored successfully (DEV_MODE)",
-                data={
-                    "reading_id": reading_dict["id"],
-                    "meter_id": reading.meter_id,
-                    "timestamp": reading_dict["timestamp"]
-                }
-            )
 
         # Check if meter is registered (Requirement 1.4)
         meter = db.query(Meter).filter(Meter.meter_id == reading.meter_id).first()
@@ -159,7 +119,7 @@ async def create_reading(
         )
 
 
-@router.get("/",
+@router.get("", 
     response_model=List[MeterReadingResponse],
     responses={
         400: {"model": ErrorResponse, "description": "Invalid query parameters"},
@@ -196,6 +156,7 @@ async def get_readings(
         if meter_id:
             query = query.filter(MeterReading.meter_id == meter_id)
         
+        print(f"DEBUG /api/readings query: meter_id={meter_id}, start_time={start_time}")
         if start_time:
             start_time = start_time.replace(tzinfo=None)
             query = query.filter(MeterReading.timestamp >= start_time)
