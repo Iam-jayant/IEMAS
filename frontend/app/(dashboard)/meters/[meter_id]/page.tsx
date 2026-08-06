@@ -321,7 +321,7 @@ export default function MeterDetailPage() {
                 <YAxis stroke="var(--text-3)" style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
-                  labelFormatter={(ts) => formatTimestamp(ts)}
+                  labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
                 <Line type="monotone" dataKey="active_power" stroke="var(--teal)" strokeWidth={2} dot={false} name="Power (kW)" />
               </LineChart>
@@ -343,7 +343,7 @@ export default function MeterDetailPage() {
                 <YAxis stroke="var(--text-3)" style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }} domain={[0.6, 1.0]} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
-                  labelFormatter={(ts) => formatTimestamp(ts)}
+                  labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
                 <Line type="monotone" dataKey="power_factor" stroke="var(--violet)" strokeWidth={2} dot={false} name="Power Factor" />
               </LineChart>
@@ -365,7 +365,7 @@ export default function MeterDetailPage() {
                 <YAxis stroke="var(--text-3)" style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
-                  labelFormatter={(ts) => formatTimestamp(ts)}
+                  labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
                 <Line type="monotone" dataKey="voltage" stroke="var(--amber)" strokeWidth={2} dot={false} name="Voltage (V)" />
               </LineChart>
@@ -387,7 +387,7 @@ export default function MeterDetailPage() {
                 <YAxis stroke="var(--text-3)" style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
-                  labelFormatter={(ts) => formatTimestamp(ts)}
+                  labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
                 <Line type="monotone" dataKey="current" stroke="#3B82F6" strokeWidth={2} dot={false} name="Current (A)" />
               </LineChart>
