@@ -71,24 +71,35 @@ function timeAgo(iso: string) {
 
 // ─── Group Readings by Hour for Trend Chart ─────────────
 function buildTrendFromHistory(historical: Reading[]) {
-  // Initialize 24 hours of data
-  const hours = Array.from({ length: 24 }, (_, i) => ({
-    hour: `${String(i).padStart(2, '0')}:00`,
-    power: 0,
-    energy: 0,
-    count: 0
-  }));
+  const hours: any[] = [];
+  const now = new Date();
+  
+  // Create last 24 hours array ending at the current hour
+  for (let i = 23; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 60 * 60 * 1000);
+    hours.push({
+      hourStr: `${String(d.getHours()).padStart(2, '0')}:00`,
+      hourNum: d.getHours(),
+      power: 0,
+      energy: 0,
+      count: 0
+    });
+  }
   
   historical.forEach(r => {
     const d = new Date(r.timestamp);
     const h = d.getHours();
-    hours[h].power += r.active_power;
-    hours[h].energy += r.cumulative_energy;
-    hours[h].count += 1;
+    // Find matching hour block
+    const target = hours.find(x => x.hourNum === h);
+    if (target) {
+      target.power += r.active_power;
+      target.energy += r.cumulative_energy;
+      target.count += 1;
+    }
   });
 
   return hours.map(h => ({
-    hour: h.hour,
+    hour: h.hourStr,
     power: h.count > 0 ? +(h.power / h.count).toFixed(2) : 0,
     energy: h.count > 0 ? +(h.energy / h.count).toFixed(2) : 0,
   }));

@@ -25,7 +25,7 @@ class AIService:
             raise ValueError("GEMINI_API_KEY environment variable not set")
         
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
     
     def classify_query(self, query: str) -> str:
         """
@@ -240,6 +240,7 @@ RESPONSE:"""
                 "query": query,
                 "query_type": "ERROR",
                 "response": f"I encountered an error processing your query: {str(e)}. Please try rephrasing your question or contact support if the issue persists.",
+                "data_used": {},
                 "error": str(e),
                 "timestamp": datetime.utcnow().isoformat()
             }
