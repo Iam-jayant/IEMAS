@@ -69,41 +69,55 @@ function timeAgo(iso: string) {
   return `${Math.floor(mins / 60)}h ago`;
 }
 
-// ─── Synthetic 24-hour trend (from the single snapshot we have) ──
-function buildTrend(readings: Reading[]) {
-  const totalPower = readings.reduce((s, r) => s + r.active_power, 0);
-  // Generate a realistic looking 24h curve
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-  const curve = hours.map((h) => {
-    // Morning ramp 06-09, peak 09-17, evening taper 17-22, overnight low
-    let factor: number;
-    if (h >= 0 && h < 6) factor = 0.3 + Math.random() * 0.1;
-    else if (h >= 6 && h < 9) factor = 0.5 + (h - 6) * 0.15 + Math.random() * 0.05;
-    else if (h >= 9 && h < 17) factor = 0.85 + Math.random() * 0.15;
-    else if (h >= 17 && h < 22) factor = 0.7 - (h - 17) * 0.08 + Math.random() * 0.05;
-    else factor = 0.35 + Math.random() * 0.1;
-
-    return {
-      hour: `${String(h).padStart(2, '0')}:00`,
-      power: +(totalPower * factor).toFixed(2),
-      energy: +(totalPower * factor * 0.95).toFixed(2),
-    };
+// ─── Group Readings by Hour for Trend Chart ─────────────
+function buildTrendFromHistory(historical: Reading[]) {
+  // Initialize 24 hours of data
+  const hours = Array.from({ length: 24 }, (_, i) => ({
+    hour: `${String(i).padStart(2, '0')}:00`,
+    power: 0,
+    energy: 0,
+    count: 0
+  }));
+  
+  historical.forEach(r => {
+    const d = new Date(r.timestamp);
+    const h = d.getHours();
+    hours[h].power += r.active_power;
+    hours[h].energy += r.cumulative_energy;
+    hours[h].count += 1;
   });
-  return curve;
+
+  return hours.map(h => ({
+    hour: h.hour,
+    power: h.count > 0 ? +(h.power / h.count).toFixed(2) : 0,
+    energy: h.count > 0 ? +(h.energy / h.count).toFixed(2) : 0,
+  }));
 }
 
 export default function AnalyticsPage() {
   const [readings, setReadings] = useState<Reading[]>([]);
+  const [trendData, setTrendData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await api.get('/api/readings/latest');
-        setReadings(Array.isArray(data) ? data : data.readings ?? []);
-      } catch {
-        // fallback to empty
-        setReadings([]);
+        const [latestRes, historyRes] = await Promise.all([
+          api.get('/api/readings/latest'),
+          // Fetch last 24 hours for the trend chart
+          api.get(`/api/readings?start_time=${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()}&limit=5000`)
+        ]);
+        
+        if (latestRes) {
+          setReadings(Array.isArray(latestRes) ? latestRes : latestRes.readings ?? []);
+        }
+        
+        if (historyRes) {
+          const historicalData = Array.isArray(historyRes) ? historyRes : (historyRes.readings ?? []);
+          setTrendData(buildTrendFromHistory(historicalData));
+        }
+      } catch (err) {
+        console.error('Failed to load analytics data', err);
       } finally {
         setLoading(false);
       }
@@ -121,8 +135,6 @@ export default function AnalyticsPage() {
     const peak = readings.reduce((top, r) => (r.active_power > top.active_power ? r : top), readings[0]);
     return { totalPower, totalEnergy, avgVoltage, avgPF, avgFreq, peak };
   }, [readings]);
-
-  const trend = useMemo(() => (readings.length ? buildTrend(readings) : []), [readings]);
 
   // Per-meter bar data
   const meterBars = useMemo(
@@ -220,7 +232,7 @@ export default function AnalyticsPage() {
         <div className="xl:col-span-2 bg-surface border border-border rounded-3xl p-5">
           <h3 className="text-sm font-display font-bold text-text-1 mb-4">24-Hour Power Trend</h3>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={trend}>
+            <AreaChart data={trendData}>
               <defs>
                 <linearGradient id={AREA_GRADIENT_ID} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#0D9488" stopOpacity={0.25} />
@@ -275,7 +287,7 @@ export default function AnalyticsPage() {
                   borderRadius: 12,
                   fontSize: 13,
                 }}
-                formatter={(val: number) => `${fmtNum(val)} kW`}
+                formatter={(val: any) => `${fmtNum(Number(val))} kW`}
               />
             </PieChart>
           </ResponsiveContainer>
