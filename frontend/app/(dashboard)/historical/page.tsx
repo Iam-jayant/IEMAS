@@ -53,7 +53,11 @@ export default function HistoricalDataPage() {
       const params = new URLSearchParams()
       if (meterId) params.append('meter_id', meterId)
       if (startDate) params.append('start_time', new Date(startDate).toISOString())
-      if (endDate) params.append('end_time', new Date(endDate).toISOString())
+      if (endDate) {
+        const end = new Date(endDate)
+        end.setHours(23, 59, 59, 999)
+        params.append('end_time', end.toISOString())
+      }
       params.append('limit', limit.toString())
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/readings?${params}`)
@@ -79,7 +83,11 @@ export default function HistoricalDataPage() {
     const params = new URLSearchParams()
     if (meterId) params.append('meter_id', meterId)
     if (startDate) params.append('start_time', new Date(startDate).toISOString())
-    if (endDate) params.append('end_time', new Date(endDate).toISOString())
+    if (endDate) {
+      const end = new Date(endDate)
+      end.setHours(23, 59, 59, 999)
+      params.append('end_time', end.toISOString())
+    }
     params.append('limit', limit.toString())
 
     const url = `${process.env.NEXT_PUBLIC_API_URL}/api/readings/export/${format}?${params}`
