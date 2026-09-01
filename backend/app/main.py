@@ -16,6 +16,13 @@ async def lifespan(app: FastAPI):
     """Application lifespan events"""
     # Startup
     print("🚀 IEMAS Backend starting up...")
+    try:
+        from app.database import engine, Base
+        import app.models.database  # Ensure models are loaded
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Warning: Database initialization skipped or failed: {e}")
     yield
     # Shutdown
     print("🔌 IEMAS Backend shutting down...")
