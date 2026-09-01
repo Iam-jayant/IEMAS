@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Send, Sparkles, Zap, TrendingUp, Activity, BarChart3 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 /**
  * IEMAS - AI Chat Component (Gemini-style)
@@ -201,7 +202,9 @@ export default function AIChat() {
                       <Sparkles className="w-4 h-4 text-violet-accent" />
                     </span>
                     <div className="flex-1 bg-surface border border-border rounded-3xl rounded-tl-lg px-5 py-4 shadow-sm">
-                      <p className="text-[15px] text-text-1 leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
+                      <div className="prose prose-sm max-w-none text-[15px] text-text-1 leading-relaxed prose-headings:text-text-1 prose-strong:text-text-1 prose-strong:font-semibold prose-p:my-2 prose-ul:my-2 prose-li:my-1">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
                       <span className="block text-xs text-text-3 mt-2">
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>

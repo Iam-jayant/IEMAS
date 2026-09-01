@@ -2,30 +2,151 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { ArrowLeft, Save, AlertTriangle, CheckCircle, Info, Cpu } from 'lucide-react';
 import { api } from '@/lib/api';
 
 interface MeterFormData {
   meter_id: string;
   name: string;
   location: string;
+  model_preset: string;
   modbus_type: 'RTU' | 'TCP';
   baudrate: number;
   slave_id: number;
+  word_order: 'ABCD' | 'CDAB';
+  registers: {
+    voltage: number;
+    current: number;
+    active_power: number;
+    reactive_power: number;
+    apparent_power: number;
+    power_factor: number;
+    frequency: number;
+    energy: number;
+  };
 }
+
+const SCHNEIDER_PRESETS: Record<string, {
+  name: string;
+  description: string;
+  baudrate: number;
+  word_order: 'ABCD' | 'CDAB';
+  registers: MeterFormData['registers'];
+}> = {
+  EM6433H: {
+    name: 'Schneider Electric EM6433H / EM64XXH (Active Bench Profile)',
+    description: 'Proven Modbus registers: Energy (2699), Power (3059), Current (3009), 9600 8-E-1',
+    baudrate: 9600,
+    word_order: 'ABCD',
+    registers: {
+      voltage: 3027,
+      current: 3009,
+      active_power: 3059,
+      reactive_power: 3067,
+      apparent_power: 3075,
+      power_factor: 3083,
+      frequency: 3109,
+      energy: 2699,
+    },
+  },
+  PM2200: {
+    name: 'Schneider EasyLogic PM2120 / PM2220',
+    description: 'Modern 3000-series registers, 32-bit Float Big-Endian (ABCD)',
+    baudrate: 9600,
+    word_order: 'ABCD',
+    registers: {
+      voltage: 3027,
+      current: 3009,
+      active_power: 3059,
+      reactive_power: 3067,
+      apparent_power: 3075,
+      power_factor: 3083,
+      frequency: 3109,
+      energy: 3203,
+    },
+  },
+  EM6400: {
+    name: 'Schneider Conzerv EM6400 / EM6436 (PMCC Panel)',
+    description: 'Classic PMCC panel meter, 3900-series registers (ABCD)',
+    baudrate: 9600,
+    word_order: 'ABCD',
+    registers: {
+      voltage: 3908,
+      current: 3900,
+      active_power: 3912,
+      reactive_power: 3914,
+      apparent_power: 3916,
+      power_factor: 3918,
+      frequency: 3920,
+      energy: 3926,
+    },
+  },
+  PM1200: {
+    name: 'Schneider PowerLogic PM1200 (Legacy Conzerv)',
+    description: 'Legacy Conzerv meter, Word-Swapped Float (CDAB)',
+    baudrate: 9600,
+    word_order: 'CDAB',
+    registers: {
+      voltage: 3908,
+      current: 3900,
+      active_power: 3912,
+      reactive_power: 3914,
+      apparent_power: 3916,
+      power_factor: 3918,
+      frequency: 3920,
+      energy: 3926,
+    },
+  },
+  PM5000: {
+    name: 'Schneider PowerLogic PM5100 / PM5300',
+    description: 'High-precision multi-function meter, 19200 baud default (ABCD)',
+    baudrate: 19200,
+    word_order: 'ABCD',
+    registers: {
+      voltage: 3027,
+      current: 3009,
+      active_power: 3059,
+      reactive_power: 3067,
+      apparent_power: 3075,
+      power_factor: 3083,
+      frequency: 3109,
+      energy: 3203,
+    },
+  },
+  CUSTOM: {
+    name: 'Custom / Other Modbus Meter',
+    description: 'Custom holding register map',
+    baudrate: 9600,
+    word_order: 'ABCD',
+    registers: {
+      voltage: 3027,
+      current: 3009,
+      active_power: 3059,
+      reactive_power: 3067,
+      apparent_power: 3075,
+      power_factor: 3083,
+      frequency: 3109,
+      energy: 3203,
+    },
+  },
+};
 
 export default function RegisterMeterPage() {
   const router = useRouter();
 
   const [formData, setFormData] = useState<MeterFormData>({
-    meter_id: '',
-    name: '',
-    location: '',
+    meter_id: 'cnc dx250',
+    name: 'Schneider EM6433H - Panel Meter',
+    location: 'PMCC Panel 1',
+    model_preset: 'EM6433H',
     modbus_type: 'RTU',
     baudrate: 9600,
-    slave_id: 1,
+    slave_id: 3,
+    word_order: 'ABCD',
+    registers: { ...SCHNEIDER_PRESETS.EM6433H.registers },
   });
 
+  const [showAdvancedRegisters, setShowAdvancedRegisters] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -56,6 +177,19 @@ export default function RegisterMeterPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handlePresetChange = (presetKey: string) => {
+    const preset = SCHNEIDER_PRESETS[presetKey];
+    if (preset) {
+      setFormData((prev) => ({
+        ...prev,
+        model_preset: presetKey,
+        baudrate: preset.baudrate,
+        word_order: preset.word_order,
+        registers: { ...preset.registers },
+      }));
+    }
+  };
+
   const handleInputChange = (field: keyof MeterFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -66,6 +200,16 @@ export default function RegisterMeterPage() {
       });
     }
     setSubmitError('');
+  };
+
+  const handleRegisterChange = (regKey: keyof MeterFormData['registers'], val: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      registers: {
+        ...prev.registers,
+        [regKey]: val,
+      },
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,19 +236,12 @@ export default function RegisterMeterPage() {
       }
 
       const modbus_config = {
+        model: formData.model_preset,
         type: formData.modbus_type,
         baudrate: formData.baudrate,
         slave_id: formData.slave_id,
-        registers: {
-          voltage: 0,
-          current: 6,
-          active_power: 12,
-          reactive_power: 18,
-          apparent_power: 24,
-          power_factor: 30,
-          frequency: 36,
-          energy: 42,
-        },
+        word_order: formData.word_order,
+        registers: formData.registers,
       };
 
       await api.post('/api/meters', {
@@ -153,7 +290,7 @@ export default function RegisterMeterPage() {
         </button>
         <div>
           <h1 className="text-lg font-bold font-display text-text-1">REGISTER SLAVE NODE</h1>
-          <p className="text-xs text-text-2 mt-0.5">Map a physical Schneider smart meter registers onto the system.</p>
+          <p className="text-xs text-text-2 mt-0.5">Map a physical Schneider Electric meter into the IEMAS registry.</p>
         </div>
       </div>
 
@@ -163,7 +300,7 @@ export default function RegisterMeterPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="text-red-accent flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-xs font-bold font-mono text-red-accent uppercase tracking-wider mb-1">Link Registration Blocked</h3>
+              <h3 className="text-xs font-bold font-mono text-red-accent uppercase tracking-wider mb-1">Registration Blocked</h3>
               <p className="text-xs text-text-2 font-sans">{submitError}</p>
             </div>
           </div>
@@ -193,12 +330,12 @@ export default function RegisterMeterPage() {
                 className={`w-full px-4 py-2.5 bg-surface-2 border rounded-xl font-mono text-xs text-text-1 focus:outline-none focus:border-teal-accent ${
                   errors.meter_id ? 'border-red-accent' : 'border-border'
                 }`}
-                placeholder="METER_004"
+                placeholder="PMCC_MTR_01"
                 disabled={isSubmitting}
               />
               {errors.meter_id && <p className="text-red-accent text-[10px] font-mono font-bold mt-1.5">{errors.meter_id}</p>}
               <p className="text-text-3 text-[9px] mt-1 font-mono">
-                Unique identifier string (uppercase characters, numerals, and hyphens/underscores).
+                Unique identifier string matching edge ESP32 config.json (e.g. PMCC_MTR_01, MCH_LATHE_01).
               </p>
             </div>
 
@@ -215,11 +352,11 @@ export default function RegisterMeterPage() {
                 className={`w-full px-4 py-2.5 bg-surface-2 border rounded-xl text-xs text-text-1 focus:outline-none focus:border-teal-accent ${
                   errors.name ? 'border-red-accent' : 'border-border'
                 }`}
-                placeholder="Production Line B - Main Panel"
+                placeholder="PMCC Panel 1 - Incomer"
                 disabled={isSubmitting}
               />
               {errors.name && <p className="text-red-accent text-[10px] font-mono font-bold mt-1.5">{errors.name}</p>}
-              <p className="text-text-3 text-[9px] mt-1 font-mono">Standard label displaying this node in registry listings.</p>
+              <p className="text-text-3 text-[9px] mt-1 font-mono">Standard label displaying this node in dashboard and alerts.</p>
             </div>
 
             {/* Location */}
@@ -235,11 +372,43 @@ export default function RegisterMeterPage() {
                 className={`w-full px-4 py-2.5 bg-surface-2 border rounded-xl text-xs text-text-1 focus:outline-none focus:border-teal-accent ${
                   errors.location ? 'border-red-accent' : 'border-border'
                 }`}
-                placeholder="Building 2, Level 1, Panel B"
+                placeholder="Main Substation / PMCC Room - Panel A"
                 disabled={isSubmitting}
               />
               {errors.location && <p className="text-red-accent text-[10px] font-mono font-bold mt-1.5">{errors.location}</p>}
-              <p className="text-text-3 text-[9px] mt-1 font-mono">Installation location metadata mapping.</p>
+              <p className="text-text-3 text-[9px] mt-1 font-mono">Physical installation panel or machine location.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Schneider Electric Meter Model Profile */}
+        <div>
+          <h2 className="text-xs font-bold text-text-3 font-mono uppercase tracking-widest pb-2.5 border-b border-border mb-4 flex items-center justify-between">
+            <span>SCHNEIDER ELECTRIC MODEL PROFILE</span>
+            <span className="text-[10px] text-teal-accent lowercase font-normal">auto-populates modbus map</span>
+          </h2>
+
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="model_preset" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
+                Select Schneider Model Preset <span className="text-red-accent">*</span>
+              </label>
+              <select
+                id="model_preset"
+                value={formData.model_preset}
+                onChange={(e) => handlePresetChange(e.target.value)}
+                className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-xs text-text-1 font-mono focus:outline-none focus:border-teal-accent cursor-pointer"
+                disabled={isSubmitting}
+              >
+                {Object.entries(SCHNEIDER_PRESETS).map(([key, preset]) => (
+                  <option key={key} value={key}>
+                    {preset.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-text-3 text-[9px] mt-1 font-mono">
+                {SCHNEIDER_PRESETS[formData.model_preset]?.description}
+              </p>
             </div>
           </div>
         </div>
@@ -266,61 +435,112 @@ export default function RegisterMeterPage() {
                 <option value="RTU">RTU (Serial RS-485)</option>
                 <option value="TCP">TCP (Modbus TCP/Ethernet)</option>
               </select>
-              <p className="text-text-3 text-[9px] mt-1 font-mono">Select serial line bus converter or TCP protocol loop.</p>
             </div>
 
-            {/* Baudrate */}
-            {formData.modbus_type === 'RTU' && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Baudrate */}
+              {formData.modbus_type === 'RTU' && (
+                <div>
+                  <label htmlFor="baudrate" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
+                    Baud Rate <span className="text-red-accent">*</span>
+                  </label>
+                  <select
+                    id="baudrate"
+                    value={formData.baudrate}
+                    onChange={(e) => handleInputChange('baudrate', parseInt(e.target.value))}
+                    className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-xs text-text-2 font-mono focus:outline-none focus:border-teal-accent cursor-pointer"
+                    disabled={isSubmitting}
+                  >
+                    <option value="9600">9600 bps</option>
+                    <option value="19200">19200 bps</option>
+                    <option value="38400">38400 bps</option>
+                    <option value="57600">57600 bps</option>
+                    <option value="115200">115200 bps</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Slave ID */}
               <div>
-                <label htmlFor="baudrate" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
-                  Serial Baud Rate <span className="text-red-accent">*</span>
+                <label htmlFor="slave_id" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
+                  Slave Node ID <span className="text-red-accent">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="slave_id"
+                  value={formData.slave_id}
+                  onChange={(e) => handleInputChange('slave_id', parseInt(e.target.value))}
+                  className={`w-full px-4 py-2.5 bg-surface-2 border rounded-xl font-mono text-xs text-text-1 focus:outline-none focus:border-teal-accent ${
+                    errors.slave_id ? 'border-red-accent' : 'border-border'
+                  }`}
+                  min="1"
+                  max="247"
+                  disabled={isSubmitting}
+                />
+                {errors.slave_id && <p className="text-red-accent text-[10px] font-mono font-bold mt-1.5">{errors.slave_id}</p>}
+              </div>
+
+              {/* Word Order */}
+              <div>
+                <label htmlFor="word_order" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
+                  Float Word Order
                 </label>
                 <select
-                  id="baudrate"
-                  value={formData.baudrate}
-                  onChange={(e) => handleInputChange('baudrate', parseInt(e.target.value))}
+                  id="word_order"
+                  value={formData.word_order}
+                  onChange={(e) => handleInputChange('word_order', e.target.value)}
                   className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-xs text-text-2 font-mono focus:outline-none focus:border-teal-accent cursor-pointer"
                   disabled={isSubmitting}
                 >
-                  <option value="9600">9600 bps</option>
-                  <option value="19200">19200 bps</option>
-                  <option value="38400">38400 bps</option>
-                  <option value="57600">57600 bps</option>
-                  <option value="115200">115200 bps</option>
+                  <option value="ABCD">Big-Endian (ABCD)</option>
+                  <option value="CDAB">Word-Swapped (CDAB)</option>
                 </select>
-                <p className="text-text-3 text-[9px] mt-1 font-mono">Speed rating configuration for the serial daisy-chain.</p>
               </div>
-            )}
-
-            {/* Slave ID */}
-            <div>
-              <label htmlFor="slave_id" className="block text-[10px] font-bold text-text-2 mb-1.5 uppercase font-mono tracking-wider">
-                Slave Node ID <span className="text-red-accent">*</span>
-              </label>
-              <input
-                type="number"
-                id="slave_id"
-                value={formData.slave_id}
-                onChange={(e) => handleInputChange('slave_id', parseInt(e.target.value))}
-                className={`w-full px-4 py-2.5 bg-surface-2 border rounded-xl font-mono text-xs text-text-1 focus:outline-none focus:border-teal-accent ${
-                  errors.slave_id ? 'border-red-accent' : 'border-border'
-                }`}
-                min="1"
-                max="247"
-                disabled={isSubmitting}
-              />
-              {errors.slave_id && <p className="text-red-accent text-[10px] font-mono font-bold mt-1.5">{errors.slave_id}</p>}
-              <p className="text-text-3 text-[9px] mt-1 font-mono">Modbus bus slave address registry index (1-247).</p>
             </div>
           </div>
+        </div>
+
+        {/* Toggle Advanced Register Customization */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowAdvancedRegisters(!showAdvancedRegisters)}
+            className="text-[11px] font-mono text-teal-accent hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <Cpu size={14} />
+            {showAdvancedRegisters ? 'Hide Register Address Mapping' : 'Customize Modbus Register Addresses'}
+          </button>
+
+          {showAdvancedRegisters && (
+            <div className="mt-3 p-4 bg-surface-2 border border-border rounded-2xl space-y-3">
+              <p className="text-[10px] font-mono text-text-3">
+                Specify base holding register addresses (0-indexed or 1-indexed according to meter manual):
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {Object.entries(formData.registers).map(([param, regVal]) => (
+                  <div key={param}>
+                    <label className="block text-[9px] font-mono uppercase text-text-2 mb-1 truncate">
+                      {param.replace('_', ' ')}
+                    </label>
+                    <input
+                      type="number"
+                      value={regVal}
+                      onChange={(e) => handleRegisterChange(param as keyof MeterFormData['registers'], parseInt(e.target.value) || 0)}
+                      className="w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs font-mono text-text-1 focus:outline-none focus:border-teal-accent"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Info Box */}
         <div className="bg-teal-accent/5 border border-teal-accent/20 rounded-2xl p-4 flex gap-3 items-start">
           <Info className="text-teal-accent flex-shrink-0 mt-0.5" size={16} />
           <div className="text-xs font-sans text-text-2 leading-relaxed">
-            <span className="font-bold text-text-1 block mb-0.5">Schneider PM8000 Registers</span>
-            The system applies default Modbus register definitions: Voltage (0), Current (6), Active Power (12), PF (30).
+            <span className="font-bold text-text-1 block mb-0.5">Active Schneider Profile: {SCHNEIDER_PRESETS[formData.model_preset]?.name}</span>
+            Voltage: <span className="font-mono text-teal-accent">{formData.registers.voltage}</span> | Current: <span className="font-mono text-teal-accent">{formData.registers.current}</span> | Active Power: <span className="font-mono text-teal-accent">{formData.registers.active_power}</span> | Energy: <span className="font-mono text-teal-accent">{formData.registers.energy}</span> | Word Order: <span className="font-mono text-teal-accent">{formData.word_order}</span>.
           </div>
         </div>
 
@@ -354,21 +574,21 @@ export default function RegisterMeterPage() {
         </div>
       </form>
 
-      {/* Help Section */}
+      {/* Field Installation Guidelines */}
       <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
-        <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-2.5">Field Installation Help</h3>
+        <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-2.5">Field Installation Guidelines</h3>
         <ul className="text-[11px] text-text-2 space-y-2 font-sans leading-relaxed">
           <li className="flex gap-2 items-start">
             <span className="text-teal-accent font-bold font-mono">1.</span>
-            <span>Ensure slave baudrate configurations match settings inside physical meter screens.</span>
+            <span>Ensure the RS-485 A(+) and B(-) wiring polarity matches between the Schneider meter terminals and the ESP32 transceiver.</span>
           </li>
           <li className="flex gap-2 items-start">
             <span className="text-teal-accent font-bold font-mono">2.</span>
-            <span>Assign distinct Slave Node IDs (1-247) to each physical sub-meter on the daisy-chain line.</span>
+            <span>Assign distinct Modbus Slave IDs (1 to 247) to every meter daisy-chained on the same PMCC bus line.</span>
           </li>
           <li className="flex gap-2 items-start">
             <span className="text-teal-accent font-bold font-mono">3.</span>
-            <span>Ensure the ESP32 edge gateway firmware configuration uses the same Meter ID register string.</span>
+            <span>Flash the corresponding <span className="font-mono text-teal-accent">meter_id</span> into the ESP32 <span className="font-mono text-teal-accent">config.json</span> before deploying onto the machine panel.</span>
           </li>
         </ul>
       </div>
