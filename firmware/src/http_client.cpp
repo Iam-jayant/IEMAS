@@ -23,8 +23,8 @@ HTTPClientManager::HTTPClientManager()
  * Requirements: 8.1 - Retry with exponential backoff (up to 3 attempts)
  * Requirements: 8.2 - Log failures after all attempts
  */
-bool HTTPClientManager::transmitReading(const String& url, const String& jsonPayload) {
-    return retryWithBackoff(url, jsonPayload, 3);
+bool HTTPClientManager::transmitReading(const String& url, const String& jsonPayload, const String& token) {
+    return retryWithBackoff(url, jsonPayload, token, 3);
 }
 
 /**
@@ -35,12 +35,13 @@ bool HTTPClientManager::transmitReading(const String& url, const String& jsonPay
  * 
  * @param url Backend collector URL endpoint
  * @param jsonPayload JSON string containing meter reading data
+ * @param token Optional device token
  * @param maxAttempts Maximum retry attempts (default 3)
  * @return true if any attempt succeeds, false if all attempts fail
  * 
  * Requirements: 8.1 - Exponential backoff retry logic
  */
-bool HTTPClientManager::retryWithBackoff(const String& url, const String& jsonPayload, int maxAttempts) {
+bool HTTPClientManager::retryWithBackoff(const String& url, const String& jsonPayload, const String& token, int maxAttempts) {
     // Check WiFi connection first
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("ERROR: WiFi not connected, cannot transmit");
@@ -68,6 +69,9 @@ bool HTTPClientManager::retryWithBackoff(const String& url, const String& jsonPa
         
         http.begin(url);
         http.addHeader("Content-Type", "application/json");
+        if (token.length() > 0) {
+            http.addHeader("X-Device-Token", token);
+        }
         http.setTimeout(5000); // 5 second timeout per attempt
         
         // Send POST request

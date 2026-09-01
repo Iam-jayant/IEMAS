@@ -256,15 +256,20 @@ bool ModbusClient::readHoldingRegisters(uint16_t startAddr, uint16_t count, uint
 float ModbusClient::parseFloat32FromRegisters(uint16_t* regs) {
     // Schneider Energy Meters typically use big-endian float representation
     // Two 16-bit registers combine to form one 32-bit float
-    // Format: [High Word][Low Word]
+    // Format: [High Word][Low Word] (ABCD) or Word-Swapped [Low Word][High Word] (CDAB)
     
     union {
         uint32_t i;
         float f;
     } value;
     
-    // Combine registers (big-endian)
-    value.i = ((uint32_t)regs[0] << 16) | regs[1];
+    if (config.wordOrder == "CDAB") {
+        // Word-swapped format (some older Schneider Conzerv meters)
+        value.i = ((uint32_t)regs[1] << 16) | regs[0];
+    } else {
+        // Standard Big-Endian format (ABCD, Schneider EasyLogic / PowerLogic)
+        value.i = ((uint32_t)regs[0] << 16) | regs[1];
+    }
     
     return value.f;
 }

@@ -18,6 +18,7 @@ struct ModbusConfig {
     uint8_t slaveId;    // Modbus slave ID
     String host;        // For TCP
     int port;           // For TCP
+    String wordOrder;   // "ABCD" (standard Big-Endian) or "CDAB" (word-swapped)
     
     // Register addresses
     uint16_t voltageReg;
@@ -40,6 +41,7 @@ public:
     
     String getMeterId() const { return meterId; }
     String getCollectorUrl() const { return collectorUrl; }
+    String getDeviceToken() const { return deviceToken; }
     unsigned long getCollectionInterval() const { return collectionInterval; }
     String getWiFiSSID() const { return wifiSSID; }
     String getWiFiPassword() const { return wifiPassword; }
@@ -48,6 +50,7 @@ public:
 private:
     String meterId;
     String collectorUrl;
+    String deviceToken;
     unsigned long collectionInterval; // seconds
     String wifiSSID;
     String wifiPassword;

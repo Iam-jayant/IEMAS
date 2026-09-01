@@ -31,6 +31,7 @@ LEDIndicator ledIndicator(LED_BUILTIN);
 // Configuration
 String meterId;
 String collectorUrl;
+String deviceToken;
 unsigned long collectionInterval = 60000; // Default 60 seconds
 unsigned long lastReadingTime = 0;
 
@@ -62,6 +63,7 @@ void setup() {
     // Get configuration values
     meterId = configManager.getMeterId();
     collectorUrl = configManager.getCollectorUrl();
+    deviceToken = configManager.getDeviceToken();
     collectionInterval = configManager.getCollectionInterval() * 1000; // Convert to ms
     wifiSSID = configManager.getWiFiSSID();
     wifiPassword = configManager.getWiFiPassword();
@@ -190,7 +192,7 @@ void loop() {
         
         // Transmit to backend
         Serial.println("\nTransmitting to backend...");
-        bool success = httpClient.transmitReading(collectorUrl, jsonPayload);
+        bool success = httpClient.transmitReading(collectorUrl, jsonPayload, deviceToken);
         
         if (success) {
             Serial.println("✓ Transmission successful");

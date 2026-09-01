@@ -1,26 +1,34 @@
 {
-  "meter_id": "METER_001",
+  "meter_id": "EM6433H_01",
   "collector_url": "http://192.168.1.100:8000/api/readings",
-  "collection_interval": 60,
+  "device_token": "",
+  "collection_interval": 10,
   "wifi": {
-    "ssid": "YourWiFiSSID",
-    "password": "YourWiFiPassword"
+    "ssid": "Your_WiFi_SSID",
+    "password": "Your_WiFi_Password"
   },
   "modbus": {
     "type": "RTU",
+    "meter_model": "Schneider_EM6433H",
     "baudrate": 9600,
-    "slave_id": 1,
+    "serial_config": "SERIAL_8E1",
+    "slave_id": 3,
+    "rx_pin": 16,
+    "tx_pin": 17,
+    "re_pin": 4,
+    "de_pin": 2,
+    "word_order": "ABCD",
     "host": "",
     "port": 502,
     "registers": {
-      "voltage": 0,
-      "current": 6,
-      "active_power": 12,
-      "reactive_power": 18,
-      "apparent_power": 24,
-      "power_factor": 30,
-      "frequency": 36,
-      "energy": 42
+      "voltage": 3027,
+      "current": 3009,
+      "active_power": 3059,
+      "reactive_power": 3067,
+      "apparent_power": 3075,
+      "power_factor": 3083,
+      "frequency": 3109,
+      "energy": 2699
     }
   }
 }

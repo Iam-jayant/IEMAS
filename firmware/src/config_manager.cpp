@@ -9,6 +9,7 @@ ConfigManager::ConfigManager() {
     // Default values
     meterId = "METER_001";
     collectorUrl = "http://192.168.1.100:8000/api/readings";
+    deviceToken = "";
     collectionInterval = 60;
     wifiSSID = "";
     wifiPassword = "";
@@ -19,16 +20,17 @@ ConfigManager::ConfigManager() {
     modbusConfig.slaveId = 1;
     modbusConfig.host = "";
     modbusConfig.port = 502;
+    modbusConfig.wordOrder = "ABCD"; // Default Big-Endian
     
-    // Default Schneider PM5000 register addresses (example)
-    modbusConfig.voltageReg = 0;
-    modbusConfig.currentReg = 6;
-    modbusConfig.activePowerReg = 12;
-    modbusConfig.reactivePowerReg = 18;
-    modbusConfig.apparentPowerReg = 24;
-    modbusConfig.powerFactorReg = 30;
-    modbusConfig.frequencyReg = 36;
-    modbusConfig.energyReg = 42;
+    // Default Schneider PM2000/PM5000 register addresses
+    modbusConfig.voltageReg = 3027;       // Voltage L-L Avg
+    modbusConfig.currentReg = 3009;       // Current Avg
+    modbusConfig.activePowerReg = 3059;   // Total Active Power (kW)
+    modbusConfig.reactivePowerReg = 3067; // Total Reactive Power (kVAR)
+    modbusConfig.apparentPowerReg = 3075; // Total Apparent Power (kVA)
+    modbusConfig.powerFactorReg = 3083;   // Total Power Factor
+    modbusConfig.frequencyReg = 3109;     // Frequency (Hz)
+    modbusConfig.energyReg = 3203;        // Active Energy (kWh)
 }
 
 /**
@@ -77,6 +79,7 @@ bool ConfigManager::loadFromFile(const char* path) {
     // Load configuration values
     meterId = doc["meter_id"] | "METER_001";
     collectorUrl = doc["collector_url"] | "http://192.168.1.100:8000/api/readings";
+    deviceToken = doc["device_token"] | "";
     collectionInterval = doc["collection_interval"] | 60;
     
     // Load WiFi configuration
@@ -94,18 +97,19 @@ bool ConfigManager::loadFromFile(const char* path) {
         modbusConfig.slaveId = modbus["slave_id"] | 1;
         modbusConfig.host = modbus["host"] | "";
         modbusConfig.port = modbus["port"] | 502;
+        modbusConfig.wordOrder = modbus["word_order"] | "ABCD";
         
         // Load register addresses
         JsonObject registers = modbus["registers"];
         if (!registers.isNull()) {
-            modbusConfig.voltageReg = registers["voltage"] | 0;
-            modbusConfig.currentReg = registers["current"] | 6;
-            modbusConfig.activePowerReg = registers["active_power"] | 12;
-            modbusConfig.reactivePowerReg = registers["reactive_power"] | 18;
-            modbusConfig.apparentPowerReg = registers["apparent_power"] | 24;
-            modbusConfig.powerFactorReg = registers["power_factor"] | 30;
-            modbusConfig.frequencyReg = registers["frequency"] | 36;
-            modbusConfig.energyReg = registers["energy"] | 42;
+            modbusConfig.voltageReg = registers["voltage"] | 3027;
+            modbusConfig.currentReg = registers["current"] | 3009;
+            modbusConfig.activePowerReg = registers["active_power"] | 3059;
+            modbusConfig.reactivePowerReg = registers["reactive_power"] | 3067;
+            modbusConfig.apparentPowerReg = registers["apparent_power"] | 3075;
+            modbusConfig.powerFactorReg = registers["power_factor"] | 3083;
+            modbusConfig.frequencyReg = registers["frequency"] | 3109;
+            modbusConfig.energyReg = registers["energy"] | 3203;
         }
     }
     
@@ -118,6 +122,7 @@ bool ConfigManager::saveToFile(const char* path) {
     
     doc["meter_id"] = meterId;
     doc["collector_url"] = collectorUrl;
+    doc["device_token"] = deviceToken;
     doc["collection_interval"] = collectionInterval;
     
     JsonObject wifi = doc["wifi"].to<JsonObject>();
@@ -130,6 +135,7 @@ bool ConfigManager::saveToFile(const char* path) {
     modbus["slave_id"] = modbusConfig.slaveId;
     modbus["host"] = modbusConfig.host;
     modbus["port"] = modbusConfig.port;
+    modbus["word_order"] = modbusConfig.wordOrder;
     
     JsonObject registers = modbus["registers"].to<JsonObject>();
     registers["voltage"] = modbusConfig.voltageReg;

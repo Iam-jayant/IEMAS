@@ -25,19 +25,21 @@ public:
      * Transmit meter reading to backend with automatic retry logic
      * @param url Backend collector URL endpoint (/api/readings)
      * @param jsonPayload JSON string containing meter reading data
+     * @param token Optional X-Device-Token for API authorization
      * @return true if transmission successful (HTTP 200/201), false otherwise
      */
-    bool transmitReading(const String& url, const String& jsonPayload);
+    bool transmitReading(const String& url, const String& jsonPayload, const String& token = "");
     
     /**
      * Retry HTTP POST with exponential backoff strategy
      * Retry delays: 1s, 2s, 4s (exponential backoff)
      * @param url Backend collector URL endpoint
      * @param jsonPayload JSON string containing meter reading data
+     * @param token Optional X-Device-Token for API authorization
      * @param maxAttempts Maximum retry attempts (default 3)
      * @return true if any attempt succeeds, false if all attempts fail
      */
-    bool retryWithBackoff(const String& url, const String& jsonPayload, int maxAttempts = 3);
+    bool retryWithBackoff(const String& url, const String& jsonPayload, const String& token = "", int maxAttempts = 3);
     
     /**
      * Get last HTTP status code from transmission attempt
