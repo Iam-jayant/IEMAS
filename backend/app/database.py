@@ -13,8 +13,18 @@ Base = declarative_base()
 if not settings.DEV_MODE:
     # Ensure correct SQLAlchemy scheme for PostgreSQL
     db_url = settings.DATABASE_URL
-    if db_url and db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    
+    if not db_url:
+        print("CRITICAL ERROR: DATABASE_URL environment variable is missing!")
+    else:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        
+        # Supabase strictly requires SSL from external cloud servers (Render)
+        if "?" not in db_url:
+            db_url += "?sslmode=require"
+        elif "sslmode=" not in db_url:
+            db_url += "&sslmode=require"
 
     # Create database engine
     engine = create_engine(
