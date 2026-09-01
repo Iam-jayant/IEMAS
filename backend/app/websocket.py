@@ -112,6 +112,20 @@ class ConnectionManager:
         
         print(f"📢 Alert broadcast to {len(self.active_connections)} clients: {alert_data.get('alert_type')} - Meter {alert_data.get('meter_id')}")
     
+    async def broadcast_reading(self, reading_data: Dict):
+        """
+        Broadcast a new meter reading to all connected dashboard clients
+        
+        Args:
+            reading_data: Reading data dictionary matching schema
+        """
+        message = json.dumps({
+            "type": "new_reading",
+            "timestamp": datetime.utcnow().isoformat(),
+            "data": reading_data
+        })
+        await self.broadcast(message)
+
     async def broadcast_system_message(self, message_type: str, data: Dict):
         """
         Broadcast a system message to all connected clients
@@ -157,12 +171,16 @@ async def broadcast_alert_to_clients(alert_data: Dict):
     Helper function to broadcast an alert from anywhere in the application
     
     Args:
-        alert_data: Alert data dictionary with keys:
-            - id: Alert ID
-            - meter_id: Meter identifier
-            - alert_type: Alert type (HIGH_POWER, LOW_POWER_FACTOR)
-            - measured_value: Measured value that triggered alert
-            - threshold_value: Threshold value
-            - timestamp: Alert timestamp
+        alert_data: Alert data dictionary
     """
     await manager.broadcast_alert(alert_data)
+
+
+async def broadcast_reading_to_clients(reading_data: Dict):
+    """
+    Helper function to broadcast a meter reading from anywhere in the application
+    
+    Args:
+        reading_data: Reading data dictionary
+    """
+    await manager.broadcast_reading(reading_data)

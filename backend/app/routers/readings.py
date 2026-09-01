@@ -2,7 +2,7 @@
 IEMAS Backend - Readings Router
 Endpoints for meter reading ingestion and retrieval
 """
-from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks, Header
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -22,6 +22,7 @@ from app.models.schemas import (
 )
 from app.models.database import MeterReading, Meter
 from app.services.alert_service import AlertService
+from app.websocket import broadcast_reading_to_clients
 from app.auth import get_current_user
 
 router = APIRouter()
@@ -39,6 +40,7 @@ router = APIRouter()
 async def create_reading(
     reading: MeterReadingCreate,
     background_tasks: BackgroundTasks,
+    x_device_token: Optional[str] = Header(None, alias="X-Device-Token"),
     db: Session = Depends(get_db)
 ):
     """
@@ -61,14 +63,31 @@ async def create_reading(
     Requirements: 1.2, 1.4, 1.5, 1.6, 9.6, 9.7, 9.8, 10.5
     """
     try:
+        # Validate device token if configured in settings
+        if settings.DEVICE_API_KEY and x_device_token != settings.DEVICE_API_KEY:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing X-Device-Token"
+            )
 
         # Check if meter is registered (Requirement 1.4)
         meter = db.query(Meter).filter(Meter.meter_id == reading.meter_id).first()
         if not meter:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Meter {reading.meter_id} is not registered. Please register the meter first."
-            )
+            if settings.AUTO_REGISTER_METERS:
+                meter = Meter(
+                    meter_id=reading.meter_id,
+                    name=f"Schneider Meter {reading.meter_id}",
+                    location="PMCC / Factory Floor",
+                    modbus_config={"type": "RTU", "auto_registered": True}
+                )
+                db.add(meter)
+                db.commit()
+                db.refresh(meter)
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Meter {reading.meter_id} is not registered. Please register the meter first."
+                )
         
         # Create database record (Requirement 1.6 - store within 500ms)
         db_reading = MeterReading(
@@ -98,6 +117,13 @@ async def create_reading(
             reading,
             reading.meter_id
         )
+
+        # Broadcast live reading to connected WebSocket clients (sub-second UI update)
+        reading_dict = reading.model_dump() if hasattr(reading, "model_dump") else reading.dict()
+        if isinstance(reading_dict.get("timestamp"), datetime):
+            reading_dict["timestamp"] = reading_dict["timestamp"].isoformat()
+        reading_dict["id"] = db_reading.id
+        background_tasks.add_task(broadcast_reading_to_clients, reading_dict)
         
         return APIResponse(
             status="success",

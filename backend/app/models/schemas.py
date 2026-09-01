@@ -63,20 +63,19 @@ class MeterRegistration(BaseModel):
     """Schema for registering a new meter"""
     meter_id: str = Field(..., min_length=1, max_length=50, description="Unique meter identifier")
     name: str = Field(..., min_length=1, max_length=255, description="Meter display name")
-    location: str = Field(..., max_length=255, description="Physical location of meter")
+    location: Optional[str] = Field(None, max_length=255, description="Physical location of meter")
     modbus_config: dict = Field(..., description="Modbus configuration (type, baudrate, slave_id, etc.)")
 
     @field_validator('modbus_config')
     @classmethod
     def validate_modbus_config(cls, v):
         """Validate Modbus configuration structure"""
-        required_keys = ['type', 'baudrate', 'slave_id']
-        if not all(key in v for key in required_keys):
-            raise ValueError(f"modbus_config must contain: {', '.join(required_keys)}")
-        
+        if not isinstance(v, dict):
+            raise ValueError("modbus_config must be a dictionary")
+        if 'type' not in v:
+            raise ValueError("modbus_config must contain 'type'")
         if v['type'] not in ['RTU', 'TCP']:
             raise ValueError("modbus_config.type must be 'RTU' or 'TCP'")
-        
         return v
 
     class Config:
@@ -246,3 +245,54 @@ class ErrorResponse(BaseModel):
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Error message")
     detail: Optional[dict] = Field(None, description="Additional error details")
+
+
+class MeterStatus(BaseModel):
+    """Schema for meter operational status"""
+    meter_id: str
+    name: str
+    location: Optional[str] = None
+    status: str = Field(..., pattern="^(online|offline)$")
+    last_reading_timestamp: Optional[datetime] = None
+    firmware_version: Optional[str] = None
+    uptime_seconds: Optional[int] = None
+
+
+class HealthCheck(BaseModel):
+    """Schema for service health verification"""
+    status: str
+    service_version: str
+    uptime_seconds: int = Field(..., ge=0)
+    database_connected: bool
+    database_ping_ms: Optional[float] = None
+
+
+class ThresholdUpdate(BaseModel):
+    """Schema for partial threshold updates"""
+    high_power_threshold: Optional[float] = Field(None, gt=0)
+    low_power_factor_threshold: Optional[float] = Field(None, ge=0, le=1)
+
+
+class Alert(BaseModel):
+    """General alert schema with optional ID and acknowledgment fields"""
+    id: Optional[int] = None
+    meter_id: str = Field(..., min_length=1, max_length=50)
+    alert_type: str = Field(..., description="Alert type: HIGH_POWER or LOW_POWER_FACTOR")
+    measured_value: float = Field(..., description="Measured value that triggered alert")
+    threshold_value: float = Field(..., description="Threshold value that was exceeded")
+    timestamp: datetime = Field(..., description="Alert timestamp")
+    acknowledged: bool = Field(default=False, description="Whether alert has been acknowledged")
+    acknowledged_at: Optional[datetime] = Field(None, description="Acknowledgment timestamp")
+    acknowledged_by: Optional[str] = Field(None, description="User who acknowledged")
+    dismissed: bool = Field(default=False, description="Whether alert has been dismissed")
+    dismissed_at: Optional[datetime] = Field(None, description="Dismissal timestamp")
+    dismissed_by: Optional[str] = Field(None, description="User who dismissed")
+    created_at: Optional[datetime] = Field(None, description="Alert creation timestamp")
+
+    @field_validator('alert_type')
+    @classmethod
+    def validate_alert_type(cls, v):
+        allowed_types = ['HIGH_POWER', 'LOW_POWER_FACTOR']
+        if v not in allowed_types:
+            raise ValueError(f"alert_type must be one of: {', '.join(allowed_types)}")
+        return v

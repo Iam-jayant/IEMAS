@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     CORS_ORIGINS: str = "http://localhost:3000"
+    DEVICE_API_KEY: str = ""
+    AUTO_REGISTER_METERS: bool = True
     
     # Database Configuration
     DATABASE_URL: str = ""

@@ -32,7 +32,7 @@ class MeterReading(Base):
     """MeterReading model - Time-series data from energy meters"""
     __tablename__ = "meter_readings"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
     meter_id = Column(String(50), ForeignKey("meters.meter_id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(TIMESTAMP, nullable=False, index=True)
     voltage = Column(Float, nullable=False)
@@ -80,7 +80,7 @@ class Alert(Base):
     """Alert model - Generated alerts for threshold violations"""
     __tablename__ = "alerts"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
     meter_id = Column(String(50), ForeignKey("meters.meter_id", ondelete="CASCADE"), nullable=False, index=True)
     alert_type = Column(String(50), nullable=False)
     measured_value = Column(Float, nullable=False)
