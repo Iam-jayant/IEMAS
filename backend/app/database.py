@@ -11,9 +11,14 @@ Base = declarative_base()
 
 # Only initialize database if not in DEV_MODE
 if not settings.DEV_MODE:
+    # Ensure correct SQLAlchemy scheme for PostgreSQL
+    db_url = settings.DATABASE_URL
+    if db_url and db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
     # Create database engine
     engine = create_engine(
-        settings.DATABASE_URL,
+        db_url,
         pool_pre_ping=True,
         pool_size=10,
         max_overflow=20

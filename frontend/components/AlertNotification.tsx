@@ -39,7 +39,11 @@ interface AlertDisplayItem extends Alert {
  * ```
  */
 export default function AlertNotification() {
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000/ws/alerts';
+  // Ensure the URL always correctly points to the endpoint, even if the user just provided the base domain
+  let wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000/ws/alerts';
+  if (!wsUrl.endsWith('/ws/alerts')) {
+    wsUrl = wsUrl.replace(/\/$/, '') + '/ws/alerts';
+  }
   const { alerts: wsAlerts, isConnected } = useWebSocket(wsUrl);
   
   const [displayAlerts, setDisplayAlerts] = useState<AlertDisplayItem[]>([]);
