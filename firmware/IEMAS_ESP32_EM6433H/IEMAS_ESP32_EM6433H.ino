@@ -110,29 +110,7 @@ void checkWiFiConnection() {
   }
 }
 
-// Get current ISO 8601 IST timestamp
-String getISOTimestamp() {
-  time_t now = time(nullptr);
-  
-  // ESP32 localtime_r / timezone parsing can be very buggy across core versions.
-  // The most foolproof way is to get UTC epoch, manually add the 5 hours 30 mins (19800s),
-  // and format it directly as UTC+0.
-  if (now > 100000) {
-    now += 19800; // Manually add +5:30 for Indian Standard Time
-  }
-  
-  struct tm timeinfo;
-  gmtime_r(&now, &timeinfo);
 
-  char buffer[32];
-  if (now > 100000) {
-    strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S+05:30", &timeinfo);
-    return String(buffer);
-  }
-
-  // Fallback if NTP sync pending
-  return "2026-09-01T12:00:00+05:30";
-}
 
 // Transmit JSON payload to IEMAS FastAPI backend with exponential backoff
 bool transmitToBackend(const String& payload) {
@@ -211,9 +189,7 @@ void setup() {
   // Connect to WiFi
   checkWiFiConnection();
 
-  // Initialize NTP time (Sync to pure UTC, we will add the offset manually in getISOTimestamp)
-  configTime(0, 0, "pool.ntp.org", "time.google.com");
-  Serial.println("[NTP] Synchronizing time...");
+
 }
 
 // ================================================================
@@ -297,7 +273,6 @@ void loop() {
     // Build JSON Payload matching IEMAS MeterReadingCreate schema
     StaticJsonDocument<512> doc;
     doc["meter_id"]          = METER_ID;
-    doc["timestamp"]         = getISOTimestamp();
     doc["voltage"]           = voltage;
     doc["current"]           = current;
     doc["active_power"]      = activePower;
