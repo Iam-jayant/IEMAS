@@ -37,9 +37,9 @@ Schneider Energy Meters (Modbus RTU/TCP) / Realistic Meter Simulator
 - **Charts**: Recharts v3
 - **Icons**: Lucide React
 
-### Realistic Meter Simulator
-- **Core**: Python 3.11+ Modbus RTU/TCP Simulator Engine
-- **Features**: Electrical parameter models, machine operation cycles, HTTP sender
+### Production Hardware & Archive
+- **Physical Edge**: ESP32 Gateways reading Schneider Electric Energy Meters (Modbus RTU/TCP) on PMCC panels & machines.
+- **Simulator Archive**: Historical synthetic testing engine archived under `archieve/realistic_meter_simulator/`.
 
 ## Project Structure
 
@@ -51,6 +51,7 @@ IEMAS/
 │   │   ├── database.py         # Database connection
 │   │   ├── models/             # Pydantic & SQLAlchemy models
 │   │   └── routers/            # API route handlers
+│   ├── scripts/                # Database maintenance & cleanup scripts
 │   └── requirements.txt        # Python dependencies
 │
 ├── frontend/                   # Next.js dashboard
@@ -60,13 +61,14 @@ IEMAS/
 │   ├── hooks/                  # Custom React hooks
 │   └── package.json            # Node dependencies
 │
-├── realistic_meter_simulator/  # Python-based IoT sensor simulator
-│   ├── main.py                 # Simulator entry point
-│   ├── simulator.py            # Modbus / IoT device engine
-│   ├── electrical_parameters.py# Voltage/Current/Power logic
-│   └── simulator_config.json   # Simulation environment config
-│
 ├── firmware/                   # ESP32 firmware (Arduino/ESP-IDF)
+│   ├── src/                    # Modbus & HTTP transmission logic
+│   ├── include/                # Register mappings & configs
+│   └── data/                   # Device config JSON
+│
+├── archieve/                   # Archived tools & prototypes
+│   └── realistic_meter_simulator/  # Archived Modbus/IoT synthetic simulator
+│
 ├── database/                   # Database schema & migrations
 └── docker-compose.yml          # Multi-container orchestration
 ```
@@ -75,6 +77,11 @@ IEMAS/
 
 ### 1. Database Setup
 Create a PostgreSQL database (e.g. Supabase) and run the SQL schema located in `database/schema.sql`.
+
+To purge test data for fresh deployment:
+```bash
+python backend/scripts/clean_database.py
+```
 
 ### 2. Backend Setup
 
@@ -104,12 +111,11 @@ npm run dev
 ```
 Frontend will be available at http://localhost:3000
 
-### 4. Running the Simulator
-To test the system locally without physical edge devices, you can use the Realistic Meter Simulator:
+### 4. Running the Archived Simulator (Optional Testing)
+For offline synthetic testing without physical meters:
 
 ```bash
-# In the project root:
-python -m realistic_meter_simulator.main
+python -m archieve.realistic_meter_simulator.main
 ```
 This will start generating simulated Modbus data and pushing it to the backend via HTTP.
 
