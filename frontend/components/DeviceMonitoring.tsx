@@ -71,7 +71,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
 
   if (isLoading) {
     return (
-      <div className={`bg-surface border border-border rounded-3xl p-6 ${className}`}>
+      <div className={`glass rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
           <Cpu className="text-text-3" size={20} />
           <h3 className="text-sm font-bold font-display text-text-1 uppercase tracking-wider">ESP32 Gateway Telemetry</h3>
@@ -83,7 +83,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
 
   if (error) {
     return (
-      <div className={`bg-surface border border-border rounded-3xl p-6 ${className}`}>
+      <div className={`glass rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
           <Cpu className="text-red-accent" size={20} />
           <h3 className="text-sm font-bold font-display text-text-1 uppercase tracking-wider">ESP32 Gateway Telemetry</h3>
@@ -98,12 +98,12 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
 
   if (!reading) {
     return (
-      <div className={`bg-surface border border-border rounded-3xl p-6 ${className}`}>
+      <div className={`glass rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
           <Cpu className="text-text-3" size={20} />
           <h3 className="text-sm font-bold font-display text-text-1 uppercase tracking-wider">ESP32 Gateway Telemetry</h3>
         </div>
-        <div className="text-center py-6 text-text-3 font-mono text-[10px] uppercase font-bold bg-surface-2 border border-border rounded-2xl">
+        <div className="text-center py-6 text-text-3 font-mono text-[10px] uppercase font-bold bg-surface-2 rounded-sm border border-border">
           No edge statistics transmitted
         </div>
       </div>
@@ -114,7 +114,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
   const hasDeviceMetrics = reading.firmware_version || reading.uptime_seconds !== undefined || reading.wifi_rssi !== undefined;
 
   return (
-    <div className={`bg-surface border border-border rounded-3xl p-6 ${className}`}>
+    <div className={`glass rounded-md p-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2.5 mb-5 border-b border-border pb-3.5">
         <Cpu className="text-teal-accent" size={20} />
@@ -125,7 +125,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Firmware */}
-          <div className="p-4 bg-surface-2 border border-border rounded-2xl">
+          <div className="p-4 bg-surface-2 border border-border rounded-sm">
             <div className="flex items-center gap-2 mb-2">
               <HardDrive className="text-text-3" size={16} />
               <h4 className="font-bold text-text-2 text-[10px] uppercase tracking-wider font-mono">Gateway Firmware</h4>
@@ -137,7 +137,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
           </div>
 
           {/* Uptime */}
-          <div className="p-4 bg-surface-2 border border-border rounded-2xl">
+          <div className="p-4 bg-surface-2 border border-border rounded-sm">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="text-text-3" size={16} />
               <h4 className="font-bold text-text-2 text-[10px] uppercase tracking-wider font-mono">Device Uptime</h4>
@@ -151,7 +151,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
           </div>
 
           {/* WiFi Signal */}
-          <div className="p-4 bg-surface-2 border border-border rounded-2xl">
+          <div className="p-4 bg-surface-2 border border-border rounded-sm">
             <div className="flex items-center gap-2 mb-2">
               <Wifi className="text-text-3" size={16} />
               <h4 className="font-bold text-text-2 text-[10px] uppercase tracking-wider font-mono">WiFi Signal RSSI</h4>
@@ -174,7 +174,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
           </div>
 
           {/* Last Beat */}
-          <div className="p-4 bg-surface-2 border border-border rounded-2xl">
+          <div className="p-4 bg-surface-2 border border-border rounded-sm">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="text-text-3" size={16} />
               <h4 className="font-bold text-text-2 text-[10px] uppercase tracking-wider font-mono">Gateway Handshake</h4>
@@ -189,7 +189,7 @@ export default function DeviceMonitoring({ meterId, className = '' }: DeviceMoni
 
         </div>
       ) : (
-        <div className="text-center py-6 bg-surface-2 border border-border rounded-2xl">
+        <div className="text-center py-6 bg-surface-2 border border-border rounded-sm">
           <AlertCircle className="text-text-3 mx-auto mb-2" size={32} />
           <p className="text-text-2 font-mono text-xs uppercase font-bold">No Device Metrics Transmitted</p>
           <p className="text-text-3 text-[10px] font-sans mt-1">

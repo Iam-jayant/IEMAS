@@ -101,12 +101,12 @@ export function RealtimeChart({
   // Loading state for queries exceeding 3 seconds
   if (isLoading) {
     return (
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+      <div className="glass rounded-md p-6">
+        <h3 className="text-lg font-semibold text-text-1 mb-4">{title}</h3>
         <div className="flex items-center justify-center" style={{ height: 300 }}>
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#019CDF]"></div>
-            <p className="text-gray-600 mt-2">Loading chart data...</p>
+            <p className="text-text-2 mt-2">Loading chart data...</p>
           </div>
         </div>
       </div>
@@ -116,12 +116,12 @@ export function RealtimeChart({
   // Error state
   if (error) {
     return (
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+      <div className="glass rounded-md p-6">
+        <h3 className="text-lg font-semibold text-text-1 mb-4">{title}</h3>
         <div className="flex items-center justify-center" style={{ height: 300 }}>
-          <div className="text-center text-red-600">
+          <div className="text-center text-red-accent">
             <p>Failed to load chart data</p>
-            <p className="text-sm text-gray-500 mt-1">{(error as Error).message}</p>
+            <p className="text-sm text-text-3 mt-1">{(error as Error).message}</p>
           </div>
         </div>
       </div>
@@ -131,10 +131,10 @@ export function RealtimeChart({
   // No data state
   if (!readings || readings.length === 0) {
     return (
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+      <div className="glass rounded-md p-6">
+        <h3 className="text-lg font-semibold text-text-1 mb-4">{title}</h3>
         <div className="flex items-center justify-center" style={{ height: 300 }}>
-          <p className="text-gray-500">No data available for the selected time range</p>
+          <p className="text-text-3">No data available for the selected time range</p>
         </div>
       </div>
     );
@@ -164,8 +164,8 @@ export function RealtimeChart({
   };
 
   return (
-    <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+    <div className="glass rounded-md p-6">
+      <h3 className="text-lg font-semibold text-text-1 mb-4">{title}</h3>
       <div className="w-full h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={sortedReadings}>

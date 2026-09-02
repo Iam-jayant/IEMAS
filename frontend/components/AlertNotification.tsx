@@ -56,8 +56,8 @@ export default function AlertNotification() {
     switch (alertType) {
       case 'HIGH_POWER':
         return {
-          bg: 'bg-red-50',
-          border: 'border-red-500',
+          bg: 'bg-red-accent/10',
+          border: 'border-red-accent/40',
           text: 'text-red-900',
           badge: 'bg-red-600',
           hover: 'hover:bg-red-100',
@@ -72,11 +72,11 @@ export default function AlertNotification() {
         };
       default:
         return {
-          bg: 'bg-gray-50',
+          bg: 'bg-surface-2',
           border: 'border-gray-500',
-          text: 'text-gray-900',
+          text: 'text-text-1',
           badge: 'bg-gray-600',
-          hover: 'hover:bg-gray-100',
+          hover: 'hover:bg-surface-2',
         };
     }
   };
@@ -237,8 +237,8 @@ export default function AlertNotification() {
     <div className="fixed top-4 right-4 z-50 w-96 space-y-2">
       {/* Connection Status Indicator */}
       {!isConnected && (
-        <div className="bg-gray-800 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2 animate-pulse">
-          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+        <div className="bg-gray-800 text-white text-xs px-3 py-2 rounded-md flex items-center gap-2 animate-pulse">
+          <span className="w-2 h-2 bg-red-accent/100 rounded-full"></span>
           <span>Reconnecting to alert service...</span>
         </div>
       )}
@@ -252,7 +252,7 @@ export default function AlertNotification() {
           <div
             key={alert.id}
             className={`
-              ${colors.bg} ${colors.border} border-l-4 rounded-lg shadow-lg p-4
+              ${colors.bg} ${colors.border} border-l-4 rounded-md shadow-lg p-4
               animate-slide-in
               transition-all duration-300 ease-out
             `}
@@ -266,12 +266,12 @@ export default function AlertNotification() {
                 <span className={`${colors.badge} text-white text-xs font-bold px-2 py-1 rounded`}>
                   {formatAlertType(alert.alert_type)}
                 </span>
-                <span className="text-xs text-gray-500 font-mono">
+                <span className="text-xs text-text-3 font-mono">
                   {formatTimestamp(alert.timestamp)}
                 </span>
               </div>
               {isConnected && (
-                <span className="w-2 h-2 bg-green-500 rounded-full" title="Connected"></span>
+                <span className="w-2 h-2 bg-teal-accent rounded-full" title="Connected"></span>
               )}
             </div>
 
@@ -285,13 +285,13 @@ export default function AlertNotification() {
             {/* Measured vs Threshold Values */}
             <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
               <div>
-                <p className="text-gray-600 text-xs font-medium">Measured Value</p>
+                <p className="text-text-2 text-xs font-medium">Measured Value</p>
                 <p className={`${colors.text} font-mono font-bold`}>
                   {alert.measured_value.toFixed(2)}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 text-xs font-medium">Threshold</p>
+                <p className="text-text-2 text-xs font-medium">Threshold</p>
                 <p className={`${colors.text} font-mono font-bold`}>
                   {alert.threshold_value.toFixed(2)}
                 </p>

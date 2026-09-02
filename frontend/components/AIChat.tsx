@@ -163,11 +163,11 @@ export default function AIChat() {
               <button
                 key={i}
                 onClick={() => handleSubmit(undefined, s.query)}
-                className="group flex items-center gap-3 px-5 py-4 bg-surface border border-border rounded-2xl text-left
+                className="group flex items-center gap-3 px-5 py-4 bg-surface border border-border rounded-md text-left
                            hover:border-violet-accent/40 hover:shadow-md hover:shadow-violet-accent/5
                            transition-all duration-200 cursor-pointer"
               >
-                <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-surface-2 text-text-3 group-hover:text-violet-accent transition-colors">
+                <span className="flex items-center justify-center w-9 h-9 rounded-md bg-surface-2 text-text-3 group-hover:text-violet-accent transition-colors">
                   <s.icon className="w-[18px] h-[18px]" />
                 </span>
                 <span className="text-sm text-text-2 group-hover:text-text-1 transition-colors font-medium leading-snug">
@@ -191,7 +191,7 @@ export default function AIChat() {
                 {message.role === 'user' ? (
                   /* ── User bubble ── */
                   <div className="flex justify-end">
-                    <div className="max-w-[80%] bg-violet-accent text-white px-5 py-3 rounded-3xl rounded-br-lg shadow-sm">
+                    <div className="max-w-[80%] bg-violet-accent text-white px-5 py-3 rounded-md rounded-br-lg ">
                       <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export default function AIChat() {
                     <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-violet-accent/20 to-teal-accent/20 mt-0.5">
                       <Sparkles className="w-4 h-4 text-violet-accent" />
                     </span>
-                    <div className="flex-1 bg-surface border border-border rounded-3xl rounded-tl-lg px-5 py-4 shadow-sm">
+                    <div className="flex-1 bg-surface border border-border rounded-md rounded-tl-lg px-5 py-4 ">
                       <div className="prose prose-sm max-w-none text-[15px] text-text-1 leading-relaxed prose-headings:text-text-1 prose-strong:text-text-1 prose-strong:font-semibold prose-p:my-2 prose-ul:my-2 prose-li:my-1">
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
@@ -220,7 +220,7 @@ export default function AIChat() {
                 <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-violet-accent/20 to-teal-accent/20">
                   <Sparkles className="w-4 h-4 text-violet-accent animate-pulse" />
                 </span>
-                <div className="bg-surface border border-border rounded-3xl rounded-tl-lg px-5 py-4 shadow-sm">
+                <div className="bg-surface border border-border rounded-md rounded-tl-lg px-5 py-4 ">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 bg-violet-accent/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-violet-accent/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -239,7 +239,7 @@ export default function AIChat() {
       {/* ───────── Error banner ───────── */}
       {error && (
         <div className="absolute left-1/2 -translate-x-1/2 bottom-28 w-full max-w-2xl px-4 z-20">
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl px-4 py-3 shadow-lg">
+          <div className="bg-red-accent/10 border border-red-accent/20 text-red-accent text-sm rounded-md px-4 py-3 shadow-lg">
             <span className="font-semibold">Error:</span> {error}
           </div>
         </div>
