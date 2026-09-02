@@ -60,7 +60,7 @@ export default function StackScrollWalkthrough() {
         'Encrypts telemetry payload strings and dispatches them over HTTPS.'
       ],
       illustration: (
-        <svg className="w-full h-full text-text-3" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full text-white/50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="30" y="30" width="140" height="140" rx="20" fill="var(--surface)" stroke="var(--border)" strokeWidth="2.5" />
           <rect x="50" y="55" width="100" height="90" rx="10" fill="var(--surface-2)" stroke="var(--border)" strokeWidth="1.5" />
           
@@ -95,7 +95,7 @@ export default function StackScrollWalkthrough() {
         'Buses multiple meters on a single RS485 daisy-chain wire run.'
       ],
       illustration: (
-        <svg className="w-full h-full text-text-3" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full text-white/50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="25" y="45" width="150" height="110" rx="16" fill="var(--surface)" stroke="var(--border)" strokeWidth="2.5" />
           
           <rect x="40" y="65" width="35" height="30" rx="6" fill="var(--teal)" />
@@ -124,7 +124,7 @@ export default function StackScrollWalkthrough() {
         'Triggers threshold checks: instantly dispatches alerts if voltage spikes or PF drops.'
       ],
       illustration: (
-        <svg className="w-full h-full text-text-3" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full text-white/50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="30" y="35" width="140" height="35" rx="8" fill="var(--surface)" stroke="var(--border)" strokeWidth="2.5" />
           <circle cx="45" cy="52" r="4" fill="var(--teal)" />
           <line x1="60" y1="52" x2="150" y2="52" stroke="var(--border)" strokeWidth="3" />
@@ -153,7 +153,7 @@ export default function StackScrollWalkthrough() {
         'Integrates cleanly with database triggers to manage historical consumption calculations.'
       ],
       illustration: (
-        <svg className="w-full h-full text-text-3" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full text-white/50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M 50 50 C 50 35, 150 35, 150 50 L 150 150 C 150 165, 50 165, 50 150 Z" fill="var(--surface)" stroke="var(--border)" strokeWidth="2" />
           
           <ellipse cx="100" cy="50" rx="50" ry="15" fill="var(--surface-2)" stroke="var(--border)" strokeWidth="2" />
@@ -178,7 +178,7 @@ export default function StackScrollWalkthrough() {
         'Compiles detailed energy saving logs and returns them as natural language action sheets.'
       ],
       illustration: (
-        <svg className="w-full h-full text-text-3" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full text-white/50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="100" cy="100" r="30" fill="var(--surface)" stroke="var(--amber)" strokeWidth="2.5" />
           <path d="M 85 90 C 85 70, 115 70, 115 90 Z" fill="var(--surface-2)" stroke="var(--border)" strokeWidth="1.5" />
           
@@ -205,8 +205,8 @@ export default function StackScrollWalkthrough() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
         {/* Sticky Visual Panel (Left Side, 5 Cols) */}
-        <div className="lg:col-span-5 lg:sticky lg:top-32 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-8 shadow-xl h-[380px] w-full">
-          <div className="absolute top-4 left-6 text-[10px] font-bold text-text-3 uppercase tracking-widest font-mono">
+        <div className="lg:col-span-5 lg:sticky lg:top-32 flex flex-col items-center justify-center bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-3xl p-8 shadow-xl h-[380px] w-full">
+          <div className="absolute top-4 left-6 text-[10px] font-bold text-white/50 uppercase tracking-widest font-mono">
             Pipeline Topology
           </div>
           
@@ -215,10 +215,10 @@ export default function StackScrollWalkthrough() {
           </div>
 
           <div className="text-center mt-6">
-            <h4 className="text-xs font-bold text-text-3 uppercase tracking-wider font-mono">
+            <h4 className="text-xs font-bold text-white/50 uppercase tracking-wider font-mono">
               {stackItems[activeStep].subtitle}
             </h4>
-            <h3 className="text-lg font-bold font-display text-text-1 mt-1">
+            <h3 className="text-lg font-bold font-display text-white mt-1">
               {stackItems[activeStep].title}
             </h3>
           </div>
@@ -238,13 +238,13 @@ export default function StackScrollWalkthrough() {
                 }}
                 className={`transition-all duration-300 p-6 rounded-3xl border ${
                   isActive 
-                    ? 'border-border bg-surface-2/40 shadow-md' 
+                    ? 'border-white/10 bg-white/[0.02] backdrop-blur-2xl/40 shadow-md' 
                     : 'border-transparent bg-transparent opacity-40'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center border ${
-                    isActive ? 'bg-teal-accent border-teal-accent text-surface' : 'bg-surface-2 border-border text-text-2'
+                    isActive ? 'bg-teal-accent border-teal-accent text-surface' : 'bg-white/[0.02] backdrop-blur-2xl border-white/10 text-white/70'
                   }`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -252,19 +252,19 @@ export default function StackScrollWalkthrough() {
                     <span className="text-[10px] text-teal-accent font-bold font-mono tracking-[0.15em] uppercase">
                       {item.subtitle}
                     </span>
-                    <h3 className="text-lg font-bold font-display text-text-1 mt-0.5">
+                    <h3 className="text-lg font-bold font-display text-white mt-0.5">
                       {item.title}
                     </h3>
                   </div>
                 </div>
 
-                <p className="text-text-2 text-xs sm:text-sm mt-4 leading-relaxed font-sans">
+                <p className="text-white/70 text-xs sm:text-sm mt-4 leading-relaxed font-sans">
                   {item.description}
                 </p>
 
                 <ul className="mt-5 space-y-2.5">
                   {item.bulletPoints.map((pt, ptIdx) => (
-                    <li key={ptIdx} className="flex gap-2.5 items-start text-xs text-text-2 leading-relaxed font-sans">
+                    <li key={ptIdx} className="flex gap-2.5 items-start text-xs text-white/70 leading-relaxed font-sans">
                       <Check className="w-4 h-4 text-teal-accent flex-shrink-0 mt-0.5" />
                       <span>{pt}</span>
                     </li>

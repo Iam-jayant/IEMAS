@@ -1,37 +1,58 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { Sparkles, DollarSign, Leaf, RefreshCw, Layers } from 'lucide-react'
+import { Sparkles, Leaf, RefreshCw, Layers } from 'lucide-react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts'
 
 export default function SavingsCalculator() {
-  const [bill, setBill] = useState(15000)
+  const [bill, setBill] = useState(1500000)
   const [currentPF, setCurrentPF] = useState(0.74)
   const [targetPF, setTargetPF] = useState(0.98)
 
   const calculations = useMemo(() => {
-    const basePenaltyFactor = 0.85
-    const penaltyRate = currentPF < basePenaltyFactor ? (basePenaltyFactor - currentPF) * 1.5 : 0
-    const monthlyPenalty = bill * penaltyRate
+    // Math based on typical Indian Industrial Tariff (MSEDCL/Torrent)
+    // Billing is primarily on kVAh. 
+    // kVAh = kWh / PF. 
+    // If PF is low, kVAh is high, resulting in higher bill.
+    const avgTariffPerUnit = 8.50 // ₹8.50 per kVAh
 
-    const demandBillPortion = bill * 0.25
-    const kvaDemandOverhead = demandBillPortion * ((targetPF / currentPF) - 1)
+    // Approximate Active Energy (kWh) consumed
+    const activeEnergyKwh = bill / avgTariffPerUnit
+    
+    // Current Apparent Energy (kVAh)
+    const currentKvah = activeEnergyKwh / currentPF
+    // Target Apparent Energy (kVAh)
+    const targetKvah = activeEnergyKwh / targetPF
 
-    const monthlySavings = monthlyPenalty + kvaDemandOverhead
+    // Savings in kVAh
+    const savedKvah = currentKvah - targetKvah
+    const monthlySavings = savedKvah * avgTariffPerUnit
     const annualSavings = monthlySavings * 12
 
-    const approxLoadKW = (bill / 0.12) / 720
+    // Penalty specific calculation (For visual breakdown)
+    const basePenaltyFactor = 0.90
+    let penaltyRate = 0
+    if (currentPF < basePenaltyFactor) {
+      penaltyRate = (basePenaltyFactor - currentPF) * 1.5 // simplified penalty multiplier
+    }
+    const monthlyPenalty = bill * penaltyRate
+    const kvaDemandOverhead = Math.max(0, monthlySavings - monthlyPenalty)
+
+    // Capacitor Bank Sizing
+    // Avg load in kW assuming 24x7 operation (720 hrs)
+    const approxLoadKW = activeEnergyKwh / 720
     const tanPhiCurrent = Math.tan(Math.acos(currentPF))
     const tanPhiTarget = Math.tan(Math.acos(targetPF))
     const kvarNeeded = Math.max(0, approxLoadKW * (tanPhiCurrent - tanPhiTarget))
-    const capBankCost = Math.round(kvarNeeded * 45 + 1200)
+    
+    // APFC Panel Cost (approx ₹1200 per kVAR + base panel cost)
+    const capBankCost = Math.round(kvarNeeded * 1200 + 25000)
 
     const paybackMonths = annualSavings > 0 ? (capBankCost / (annualSavings / 12)) : 0
 
-    const totalMonthlyKWh = bill / 0.12
     const lineLossPercent = 0.04 
-    const lossesAvoidedKWh = totalMonthlyKWh * lineLossPercent * (1 - Math.pow(currentPF / targetPF, 2))
-    const co2TonsAnnual = (lossesAvoidedKWh * 12 * 0.45) / 1000
+    const lossesAvoidedKWh = activeEnergyKwh * lineLossPercent * (1 - Math.pow(currentPF / targetPF, 2))
+    const co2TonsAnnual = (lossesAvoidedKWh * 12 * 0.85) / 1000 // 0.85 kg CO2 per kWh for Indian grid
     const treesEquivalent = co2TonsAnnual * 16.5 
 
     return {
@@ -40,7 +61,7 @@ export default function SavingsCalculator() {
       totalSavingsMonthly: Math.round(monthlySavings),
       annualSavings: Math.round(annualSavings),
       capBankCost: Math.round(capBankCost),
-      paybackMonths: +paybackMonths.toFixed(1),
+      paybackMonths: paybackMonths > 0 ? +paybackMonths.toFixed(1) : 0,
       co2Tons: +co2TonsAnnual.toFixed(1),
       trees: Math.round(treesEquivalent),
       kvarNeeded: Math.round(kvarNeeded)
@@ -52,17 +73,26 @@ export default function SavingsCalculator() {
     { name: 'After Correction', cost: 0, color: '#2DD4BF' }
   ]
 
+  // INR Formatter
+  const formatINR = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(value)
+  }
+
   return (
-    <div className="w-full bg-surface border border-border rounded-3xl p-6 md:p-8 shadow-xl">
+    <div className="w-full bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
       
       {/* Header Info */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <span className="px-3 py-1 bg-surface-2 border border-border text-teal-accent text-[0.7rem] uppercase tracking-[0.15em] font-mono rounded-full inline-flex items-center gap-1.5 mb-2">
+          <span className="px-3 py-1 bg-white/[0.02] backdrop-blur-2xl border border-white/10 text-teal-accent text-[0.7rem] uppercase tracking-[0.15em] font-mono rounded-full inline-flex items-center gap-1.5 mb-2">
             <Leaf className="w-3.5 h-3.5 text-teal-accent" /> Facility Sustainability & ROI Calculator
           </span>
-          <h3 className="text-xl font-bold font-display text-text-1">Power Factor ROI Calculator</h3>
-          <p className="text-text-2 text-xs sm:text-sm mt-1 font-sans">
+          <h3 className="text-xl font-bold font-display text-white">Power Factor ROI Calculator</h3>
+          <p className="text-white/70 text-xs sm:text-sm mt-1 font-sans">
             Determine financial payback margins and carbon offsets generated by improving electrical power quality.
           </p>
         </div>
@@ -71,34 +101,34 @@ export default function SavingsCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
         {/* Sliders (Left Panel) */}
-        <div className="lg:col-span-4 space-y-6 bg-surface-2 border border-border p-5 rounded-2xl">
-          <h4 className="text-xs font-bold text-text-3 uppercase tracking-widest pb-2 border-b border-border font-mono">Parameters</h4>
+        <div className="lg:col-span-4 space-y-6 bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-5 rounded-2xl">
+          <h4 className="text-xs font-bold text-white/50 uppercase tracking-widest pb-2 border-b border-white/10 font-mono">Parameters</h4>
           
           {/* Monthly Utility Bill */}
           <div className="space-y-1.5 font-mono">
             <div className="flex justify-between text-xs">
-              <span className="text-text-2">Monthly Energy Bill</span>
-              <span className="text-text-1 font-bold">${bill.toLocaleString()}</span>
+              <span className="text-white/70">Monthly Energy Bill</span>
+              <span className="text-white font-bold">{formatINR(bill)}</span>
             </div>
             <input 
               type="range" 
-              min="2000" 
-              max="100000" 
-              step="1000"
+              min="100000" 
+              max="5000000" 
+              step="50000"
               value={bill} 
               onChange={(e) => setBill(Number(e.target.value))}
               className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-teal-accent"
             />
-            <div className="flex justify-between text-[9px] text-text-3">
-              <span>$2,000</span>
-              <span>$100,000</span>
+            <div className="flex justify-between text-[9px] text-white/50">
+              <span>₹1 Lakh</span>
+              <span>₹50 Lakhs</span>
             </div>
           </div>
 
           {/* Current PF slider */}
           <div className="space-y-1.5 font-mono">
             <div className="flex justify-between text-xs">
-              <span className="text-text-2">Current Power Factor</span>
+              <span className="text-white/70">Current Power Factor</span>
               <span className="text-amber-accent font-bold">{currentPF}</span>
             </div>
             <input 
@@ -110,7 +140,7 @@ export default function SavingsCalculator() {
               onChange={(e) => setCurrentPF(Number(e.target.value))}
               className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-amber-accent"
             />
-            <div className="flex justify-between text-[9px] text-text-3">
+            <div className="flex justify-between text-[9px] text-white/50">
               <span>0.60 (Lagging)</span>
               <span>0.95 (Good)</span>
             </div>
@@ -119,7 +149,7 @@ export default function SavingsCalculator() {
           {/* Target PF slider */}
           <div className="space-y-1.5 font-mono">
             <div className="flex justify-between text-xs">
-              <span className="text-text-2">Target Power Factor</span>
+              <span className="text-white/70">Target Power Factor</span>
               <span className="text-teal-accent font-bold">{targetPF}</span>
             </div>
             <input 
@@ -131,16 +161,16 @@ export default function SavingsCalculator() {
               onChange={(e) => setTargetPF(Number(e.target.value))}
               className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-teal-accent"
             />
-            <div className="flex justify-between text-[9px] text-text-3">
+            <div className="flex justify-between text-[9px] text-white/50">
               <span>0.90 Target</span>
               <span>1.00 (Unity)</span>
             </div>
           </div>
 
-          <div className="bg-surface p-3.5 rounded-xl border border-border text-xs leading-relaxed text-text-2 shadow-sm font-sans">
-            <span className="font-bold text-text-1">Capacitor Stage Required:</span>
+          <div className="bg-white/[0.03] backdrop-blur-3xl p-3.5 rounded-xl border border-white/10 text-xs leading-relaxed text-white/70 shadow-sm font-sans">
+            <span className="font-bold text-white">Capacitor Stage Required:</span>
             <p className="mt-1 font-mono text-[11px]">
-              To close this reactive gap, you will require an estimated <span className="text-teal-accent font-bold">{calculations.kvarNeeded} kVAR</span> capacitor step setup.
+              To close this reactive gap, you will require an estimated <span className="text-teal-accent font-bold">{calculations.kvarNeeded} kVAR</span> APFC panel setup.
             </p>
           </div>
         </div>
@@ -152,41 +182,41 @@ export default function SavingsCalculator() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             {/* Savings card */}
-            <div className="bg-surface-2 border border-border p-4 rounded-2xl relative overflow-hidden">
-              <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-teal-accent mb-3 shadow-sm">
-                <DollarSign className="w-5 h-5" />
+            <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl relative overflow-hidden">
+              <div className="w-9 h-9 rounded-xl bg-white/[0.03] backdrop-blur-3xl border border-white/10 flex items-center justify-center text-teal-accent mb-3 shadow-sm text-lg font-bold">
+                ₹
               </div>
-              <div className="text-[10px] text-text-3 font-bold uppercase tracking-wider font-mono">Annual Surcharge Avoided</div>
-              <div className="text-xl font-bold text-text-1 mt-1 font-mono">${calculations.annualSavings.toLocaleString()}</div>
-              <div className="text-[10px] text-text-2 mt-2 font-mono">
-                Saves <span className="text-teal-accent font-bold">${calculations.totalSavingsMonthly} / mo</span>.
+              <div className="text-[10px] text-white/50 font-bold uppercase tracking-wider font-mono">Annual Surcharge Avoided</div>
+              <div className="text-xl font-bold text-white mt-1 font-mono">{formatINR(calculations.annualSavings)}</div>
+              <div className="text-[10px] text-white/70 mt-2 font-mono">
+                Saves <span className="text-teal-accent font-bold">{formatINR(calculations.totalSavingsMonthly)} / mo</span>.
               </div>
             </div>
 
             {/* Payback period card */}
-            <div className="bg-surface-2 border border-border p-4 rounded-2xl relative overflow-hidden">
-              <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-teal-accent mb-3 shadow-sm">
+            <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl relative overflow-hidden">
+              <div className="w-9 h-9 rounded-xl bg-white/[0.03] backdrop-blur-3xl border border-white/10 flex items-center justify-center text-teal-accent mb-3 shadow-sm">
                 <RefreshCw className="w-5 h-5" />
               </div>
-              <div className="text-[10px] text-text-3 font-bold uppercase tracking-wider font-mono">Estimated Payback Period</div>
-              <div className="text-xl font-bold text-text-1 mt-1 font-mono">
+              <div className="text-[10px] text-white/50 font-bold uppercase tracking-wider font-mono">Estimated Payback Period</div>
+              <div className="text-xl font-bold text-white mt-1 font-mono">
                 {calculations.paybackMonths} {calculations.paybackMonths === 1 ? 'Month' : 'Months'}
               </div>
-              <div className="text-[10px] text-text-2 mt-2 font-mono">
-                APFC bank cost: <span className="text-teal-accent font-bold">${calculations.capBankCost.toLocaleString()}</span>
+              <div className="text-[10px] text-white/70 mt-2 font-mono">
+                APFC bank cost: <span className="text-teal-accent font-bold">{formatINR(calculations.capBankCost)}</span>
               </div>
             </div>
 
             {/* Carbon card */}
-            <div className="bg-surface-2 border border-border p-4 rounded-2xl relative overflow-hidden">
-              <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-teal-accent mb-3 shadow-sm">
+            <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-4 rounded-2xl relative overflow-hidden">
+              <div className="w-9 h-9 rounded-xl bg-white/[0.03] backdrop-blur-3xl border border-white/10 flex items-center justify-center text-teal-accent mb-3 shadow-sm">
                 <Leaf className="w-5 h-5" />
               </div>
-              <div className="text-[10px] text-text-3 font-bold uppercase tracking-wider font-mono">Carbon Offset Potential</div>
+              <div className="text-[10px] text-white/50 font-bold uppercase tracking-wider font-mono">Carbon Offset Potential</div>
               <div className="text-xl font-bold text-teal-accent mt-1 font-mono">
                 {calculations.co2Tons} Tons CO₂
               </div>
-              <div className="text-[10px] text-text-2 mt-2 font-mono">
+              <div className="text-[10px] text-white/70 mt-2 font-mono">
                 Equivalent to <span className="text-teal-accent font-bold">{calculations.trees}</span> trees / yr.
               </div>
             </div>
@@ -194,31 +224,31 @@ export default function SavingsCalculator() {
           </div>
 
           {/* Surcharges breakdown box */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-surface-2 border border-border p-5 rounded-2xl flex-grow">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-white/[0.02] backdrop-blur-2xl border border-white/10 p-5 rounded-2xl flex-grow">
             
             <div className="md:col-span-7 space-y-4">
-              <h4 className="text-xs font-bold text-text-2 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+              <h4 className="text-xs font-bold text-white/70 uppercase tracking-wider flex items-center gap-1.5 font-mono">
                 <Layers className="w-3.5 h-3.5 text-teal-accent" /> Utility Bill Surcharge Avoidance Profile
               </h4>
               
-              <div className="space-y-3.5 text-xs text-text-2 leading-relaxed font-sans">
+              <div className="space-y-3.5 text-xs text-white/70 leading-relaxed font-sans">
                 <p>
-                  Industrial electricity distributors apply line surcharges when power factor drops below <span className="font-bold text-text-1">0.85</span>. Low PF draws high reactive current which overloads local transformer windings.
+                  In Indian industrial tariffs (kVAh billing), low power factor directly inflates billed demand and energy consumption. Maintaining PF near unity avoids severe kVAh penalties.
                 </p>
-                <div className="flex flex-col gap-2 bg-surface p-3.5 rounded-xl border border-border font-mono">
+                <div className="flex flex-col gap-2 bg-white/[0.03] backdrop-blur-3xl p-3.5 rounded-xl border border-white/10 font-mono">
                   <div className="flex justify-between">
-                    <span>Power Quality Surcharge Penalty:</span>
-                    <span className="text-amber-accent font-bold">${calculations.monthlyPenalty} / mo</span>
+                    <span>Low PF Penalty Surcharge:</span>
+                    <span className="text-amber-accent font-bold">{formatINR(calculations.monthlyPenalty)} / mo</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Excess Demand (kVA Surcharge):</span>
-                    <span className="text-amber-accent font-bold">${calculations.kvaOverhead} / mo</span>
+                    <span>Excess kVAh Demand Billing:</span>
+                    <span className="text-amber-accent font-bold">{formatINR(calculations.kvaOverhead)} / mo</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="md:col-span-5 h-[150px] w-full flex items-center justify-center bg-surface border border-border rounded-xl p-2 shadow-inner">
+            <div className="md:col-span-5 h-[150px] w-full flex items-center justify-center bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-xl p-2 shadow-inner">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ left: -10, top: 10, right: 10, bottom: 5 }}>
                   <XAxis dataKey="name" stroke="#4A5A6B" fontSize={9} tickLine={false} />

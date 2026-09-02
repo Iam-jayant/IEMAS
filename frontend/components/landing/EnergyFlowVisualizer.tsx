@@ -19,7 +19,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   main: {
     name: 'Main Incomer (Schneider PM8000)',
     icon: Zap,
-    color: 'text-teal-accent border-border bg-surface-2',
+    color: 'text-teal-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(45, 212, 191, 0.2)',
     basePower: 0,
     unit: 'kW',
@@ -28,7 +28,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   prodA: {
     name: 'Production Line A (Heavy Machining)',
     icon: Factory,
-    color: 'text-teal-accent border-border bg-surface-2',
+    color: 'text-teal-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(45, 212, 191, 0.1)',
     basePower: 250,
     unit: 'kW',
@@ -37,7 +37,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   prodB: {
     name: 'Production Line B (Robotic Assembly)',
     icon: Factory,
-    color: 'text-teal-accent border-border bg-surface-2',
+    color: 'text-teal-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(45, 212, 191, 0.1)',
     basePower: 120,
     unit: 'kW',
@@ -46,7 +46,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   dataCenter: {
     name: 'Enterprise Data Center',
     icon: Server,
-    color: 'text-teal-accent border-border bg-surface-2',
+    color: 'text-teal-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(45, 212, 191, 0.1)',
     basePower: 180,
     unit: 'kW',
@@ -55,7 +55,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   hvac: {
     name: 'HVAC & Facility Ventilation',
     icon: Fan,
-    color: 'text-teal-accent border-border bg-surface-2',
+    color: 'text-teal-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(45, 212, 191, 0.1)',
     basePower: 90,
     unit: 'kW',
@@ -64,7 +64,7 @@ const nodesConfig: Record<NodeKey, NodeDetails> = {
   solar: {
     name: 'Rooftop Solar Array',
     icon: Sun,
-    color: 'text-amber-accent border-border bg-surface-2',
+    color: 'text-amber-accent border-white/10 bg-white/[0.02] backdrop-blur-2xl',
     glowColor: 'rgba(245, 158, 11, 0.1)',
     basePower: -100, // Negative because it generates energy
     unit: 'kW',
@@ -160,38 +160,39 @@ export default function EnergyFlowVisualizer() {
 
   const getFlowSpeed = (key: NodeKey) => {
     if (!toggles[key] || loadLevels[key] === 0) return '0s'
-    const speed = 12 - (loadLevels[key] / 100) * 10
+    // Slow, realistic data flow speeds (10s to 25s depending on load)
+    const speed = 25 - (loadLevels[key] / 100) * 15
     return `${speed.toFixed(1)}s`
   }
 
   return (
-    <div className="w-full bg-surface border border-border rounded-3xl overflow-hidden p-6 md:p-8 shadow-2xl">
+    <div className="w-full bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-3xl overflow-hidden p-6 md:p-8 shadow-2xl">
       
       {/* Header Info */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
         <div>
-          <span className="px-3 py-1 bg-surface-2 border border-border text-teal-accent text-[0.7rem] uppercase tracking-[0.15em] font-mono rounded-full inline-flex items-center gap-1.5 mb-2">
+          <span className="px-3 py-1 bg-white/[0.02] backdrop-blur-2xl border border-white/10 text-teal-accent text-[0.7rem] uppercase tracking-[0.15em] font-mono rounded-full inline-flex items-center gap-1.5 mb-2">
             <Radio className="w-3.5 h-3.5 text-teal-accent animate-pulse" /> Live Telemetry Flow Map
           </span>
-          <h3 className="text-xl font-bold font-display text-text-1">Operational Energy Schematic</h3>
-          <p className="text-text-2 text-xs sm:text-sm mt-1">
+          <h3 className="text-xl font-bold font-display text-white">Operational Energy Schematic</h3>
+          <p className="text-white/70 text-xs sm:text-sm mt-1">
             Toggle breakers, slide operational levels, and observe utility load fluctuations calculated dynamically.
           </p>
         </div>
         
         {/* Overall system metric pills */}
-        <div className="grid grid-cols-3 gap-3 w-full lg:w-auto bg-surface-2 p-3.5 border border-border rounded-2xl">
-          <div className="text-center px-4 border-r border-border">
-            <div className="text-[9px] text-text-3 uppercase font-bold tracking-wider font-mono">Net Incomer</div>
+        <div className="grid grid-cols-3 gap-3 w-full lg:w-auto bg-white/[0.02] backdrop-blur-2xl p-3.5 border border-white/10 rounded-2xl">
+          <div className="text-center px-4 border-r border-white/10">
+            <div className="text-[9px] text-white/50 uppercase font-bold tracking-wider font-mono">Net Incomer</div>
             <div className="text-base font-bold text-teal-accent mt-0.5 font-mono">{netMainPower} kW</div>
           </div>
-          <div className="text-center px-4 border-r border-border">
-            <div className="text-[9px] text-text-3 uppercase font-bold tracking-wider font-mono">Solar Gen</div>
+          <div className="text-center px-4 border-r border-white/10">
+            <div className="text-[9px] text-white/50 uppercase font-bold tracking-wider font-mono">Solar Gen</div>
             <div className="text-base font-bold text-amber-accent mt-0.5 font-mono">{Math.abs(pSolar)} kW</div>
           </div>
           <div className="text-center px-4">
-            <div className="text-[9px] text-text-3 uppercase font-bold tracking-wider font-mono">Facility PF</div>
-            <div className="text-base font-bold text-text-1 mt-0.5 font-mono">{getPF('main')}</div>
+            <div className="text-[9px] text-white/50 uppercase font-bold tracking-wider font-mono">Facility PF</div>
+            <div className="text-base font-bold text-white mt-0.5 font-mono">{getPF('main')}</div>
           </div>
         </div>
       </div>
@@ -199,7 +200,7 @@ export default function EnergyFlowVisualizer() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
         {/* SVG Flow Map */}
-        <div className="lg:col-span-8 bg-bg border border-border rounded-2xl p-4 flex flex-col justify-between min-h-[400px] relative overflow-hidden">
+        <div className="lg:col-span-8 bg-[#050505] border border-white/10 rounded-2xl p-4 flex flex-col justify-between min-h-[400px] relative overflow-hidden">
           
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#1E2D38_1px,transparent_1px),linear-gradient(to_bottom,#1E2D38_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none" />
 
@@ -213,11 +214,12 @@ export default function EnergyFlowVisualizer() {
                 d="M 120 160 C 200 160, 200 48, 320 48" 
                 fill="none" 
                 stroke="#2DD4BF" 
-                strokeWidth="2.5" 
-                strokeDasharray="6, 8"
+                strokeWidth="3" 
+                strokeDasharray="40, 800"
                 style={{ 
-                  animation: `flow-right ${getFlowSpeed('prodA')} linear infinite`,
-                  opacity: toggles['prodA'] ? 0.9 : 0 
+                  animation: `flowLightRight ${getFlowSpeed('prodA')} linear infinite`,
+                  opacity: toggles['prodA'] ? 0.9 : 0,
+                  filter: 'drop-shadow(0 0 4px rgba(45, 212, 191, 0.8))'
                 }} 
               />
 
@@ -227,11 +229,12 @@ export default function EnergyFlowVisualizer() {
                 d="M 120 160 C 200 160, 200 122, 320 122" 
                 fill="none" 
                 stroke="#2DD4BF" 
-                strokeWidth="2.5" 
-                strokeDasharray="6, 8"
+                strokeWidth="3" 
+                strokeDasharray="40, 800"
                 style={{ 
-                  animation: `flow-right ${getFlowSpeed('prodB')} linear infinite`,
-                  opacity: toggles['prodB'] ? 0.9 : 0 
+                  animation: `flowLightRight ${getFlowSpeed('prodB')} linear infinite`,
+                  opacity: toggles['prodB'] ? 0.9 : 0,
+                  filter: 'drop-shadow(0 0 4px rgba(45, 212, 191, 0.8))'
                 }} 
               />
 
@@ -241,11 +244,12 @@ export default function EnergyFlowVisualizer() {
                 d="M 120 160 C 200 160, 200 272, 320 272" 
                 fill="none" 
                 stroke="#F59E0B" 
-                strokeWidth="2.5" 
-                strokeDasharray="6, 8"
+                strokeWidth="3" 
+                strokeDasharray="40, 800"
                 style={{ 
-                  animation: `flow-left ${getFlowSpeed('solar')} linear infinite`,
-                  opacity: toggles['solar'] ? 0.9 : 0 
+                  animation: `flowLightLeft ${getFlowSpeed('solar')} linear infinite`,
+                  opacity: toggles['solar'] ? 0.9 : 0,
+                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.8))'
                 }} 
               />
 
@@ -255,11 +259,12 @@ export default function EnergyFlowVisualizer() {
                 d="M 380 122 C 450 122, 450 80, 560 80" 
                 fill="none" 
                 stroke="#2DD4BF" 
-                strokeWidth="2.5" 
-                strokeDasharray="6, 8"
+                strokeWidth="3" 
+                strokeDasharray="40, 800"
                 style={{ 
-                  animation: `flow-right ${getFlowSpeed('dataCenter')} linear infinite`,
-                  opacity: (toggles['dataCenter'] && toggles['prodB']) ? 0.9 : 0 
+                  animation: `flowLightRight ${getFlowSpeed('dataCenter')} linear infinite`,
+                  opacity: (toggles['dataCenter'] && toggles['prodB']) ? 0.9 : 0,
+                  filter: 'drop-shadow(0 0 4px rgba(45, 212, 191, 0.8))'
                 }} 
               />
 
@@ -269,11 +274,12 @@ export default function EnergyFlowVisualizer() {
                 d="M 380 122 C 450 122, 450 240, 560 240" 
                 fill="none" 
                 stroke="#2DD4BF" 
-                strokeWidth="2.5" 
-                strokeDasharray="6, 8"
+                strokeWidth="3" 
+                strokeDasharray="40, 800"
                 style={{ 
-                  animation: `flow-right ${getFlowSpeed('hvac')} linear infinite`,
-                  opacity: (toggles['hvac'] && toggles['prodB']) ? 0.9 : 0 
+                  animation: `flowLightRight ${getFlowSpeed('hvac')} linear infinite`,
+                  opacity: (toggles['hvac'] && toggles['prodB']) ? 0.9 : 0,
+                  filter: 'drop-shadow(0 0 4px rgba(45, 212, 191, 0.8))'
                 }} 
               />
             </svg>
@@ -284,14 +290,14 @@ export default function EnergyFlowVisualizer() {
               onClick={() => setSelectedNode('main')}
               className={`absolute left-[5%] top-[37%] flex flex-col items-center justify-center p-3 rounded-2xl border transition-all z-10 select-none cursor-pointer ${
                 selectedNode === 'main' 
-                  ? 'border-teal-accent bg-surface-2 scale-105 shadow-lg shadow-teal-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-teal-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-teal-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-teal-accent/10 text-teal-accent flex items-center justify-center">
                 <Zap className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">Main Incomer</span>
+              <span className="text-xs font-bold text-white mt-1.5">Main Incomer</span>
               <span className="text-[10px] text-teal-accent font-mono mt-0.5 font-bold">
                 {netMainPower} kW
               </span>
@@ -304,14 +310,14 @@ export default function EnergyFlowVisualizer() {
                 !toggles['prodA'] ? 'opacity-45' : ''
               } ${
                 selectedNode === 'prodA' 
-                  ? 'border-teal-accent bg-surface-2 scale-105 shadow-lg shadow-teal-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-teal-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-teal-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-teal-accent/10 text-teal-accent flex items-center justify-center">
                 <Factory className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">Production A</span>
+              <span className="text-xs font-bold text-white mt-1.5">Production A</span>
               <span className="text-[10px] text-teal-accent font-mono mt-0.5 font-bold">
                 {pProdA} kW
               </span>
@@ -324,14 +330,14 @@ export default function EnergyFlowVisualizer() {
                 !toggles['prodB'] ? 'opacity-45' : ''
               } ${
                 selectedNode === 'prodB' 
-                  ? 'border-teal-accent bg-surface-2 scale-105 shadow-lg shadow-teal-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-teal-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-teal-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-teal-accent/10 text-teal-accent flex items-center justify-center">
                 <Factory className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">Production B</span>
+              <span className="text-xs font-bold text-white mt-1.5">Production B</span>
               <span className="text-[10px] text-teal-accent font-mono mt-0.5 font-bold">
                 {pProdB} kW
               </span>
@@ -344,14 +350,14 @@ export default function EnergyFlowVisualizer() {
                 !toggles['solar'] ? 'opacity-45' : ''
               } ${
                 selectedNode === 'solar' 
-                  ? 'border-amber-accent bg-surface-2 scale-105 shadow-lg shadow-amber-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-amber-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-amber-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-amber-accent/10 text-amber-accent flex items-center justify-center">
                 <Sun className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">Solar PV</span>
+              <span className="text-xs font-bold text-white mt-1.5">Solar PV</span>
               <span className="text-[10px] text-amber-accent font-mono mt-0.5 font-bold">
                 {Math.abs(pSolar)} kW
               </span>
@@ -364,14 +370,14 @@ export default function EnergyFlowVisualizer() {
                 !toggles['dataCenter'] ? 'opacity-45' : ''
               } ${
                 selectedNode === 'dataCenter' 
-                  ? 'border-teal-accent bg-surface-2 scale-105 shadow-lg shadow-teal-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-teal-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-teal-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-teal-accent/10 text-teal-accent flex items-center justify-center">
                 <Server className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">Data Center</span>
+              <span className="text-xs font-bold text-white mt-1.5">Data Center</span>
               <span className="text-[10px] text-teal-accent font-mono mt-0.5 font-bold">
                 {pDataCenter} kW
               </span>
@@ -384,14 +390,14 @@ export default function EnergyFlowVisualizer() {
                 !toggles['hvac'] ? 'opacity-45' : ''
               } ${
                 selectedNode === 'hvac' 
-                  ? 'border-teal-accent bg-surface-2 scale-105 shadow-lg shadow-teal-accent/5' 
-                  : 'border-border bg-surface hover:border-text-3 shadow-sm'
+                  ? 'border-teal-accent bg-white/[0.02] backdrop-blur-2xl scale-105 shadow-lg shadow-teal-accent/5' 
+                  : 'border-white/10 bg-white/[0.03] backdrop-blur-3xl hover:border-text-3 shadow-sm'
               }`}
             >
               <div className="w-10 h-10 rounded-xl bg-teal-accent/10 text-teal-accent flex items-center justify-center">
                 <Fan className="w-5 h-5" style={{ animation: toggles['hvac'] ? 'spin 2.5s linear infinite' : 'none' }} />
               </div>
-              <span className="text-xs font-bold text-text-1 mt-1.5">HVAC Chiller</span>
+              <span className="text-xs font-bold text-white mt-1.5">HVAC Chiller</span>
               <span className="text-[10px] text-teal-accent font-mono mt-0.5 font-bold">
                 {pHvac} kW
               </span>
@@ -400,8 +406,8 @@ export default function EnergyFlowVisualizer() {
           </div>
 
           {/* Legend */}
-          <div className="flex gap-3 flex-wrap items-center mt-4 pt-4 border-t border-border text-xs text-text-3 font-mono">
-            <span className="font-bold uppercase tracking-wider text-text-2">FLOW LEGEND:</span>
+          <div className="flex gap-3 flex-wrap items-center mt-4 pt-4 border-t border-white/10 text-xs text-white/50 font-mono">
+            <span className="font-bold uppercase tracking-wider text-white/70">FLOW LEGEND:</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-teal-accent inline-block" /> Active Telemetry Node</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-accent inline-block" /> Active Generation Node</span>
           </div>
@@ -409,12 +415,12 @@ export default function EnergyFlowVisualizer() {
         </div>
 
         {/* Right Side: Control Console */}
-        <div className="lg:col-span-4 flex flex-col bg-surface-2 border border-border rounded-2xl p-5 justify-between">
+        <div className="lg:col-span-4 flex flex-col bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl p-5 justify-between">
           <div>
-            <div className="flex items-start justify-between gap-2 mb-4 pb-4 border-b border-border">
+            <div className="flex items-start justify-between gap-2 mb-4 pb-4 border-b border-white/10">
               <div>
-                <h4 className="text-[10px] font-bold text-text-3 uppercase tracking-widest font-mono">Channel Monitor</h4>
-                <div className="text-base font-extrabold text-text-1 mt-1 flex items-center gap-2">
+                <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-widest font-mono">Channel Monitor</h4>
+                <div className="text-base font-extrabold text-white mt-1 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-teal-accent animate-pulse" />
                   {nodesConfig[selectedNode].name}
                 </div>
@@ -436,38 +442,38 @@ export default function EnergyFlowVisualizer() {
               )}
             </div>
 
-            <p className="text-text-2 text-xs leading-relaxed mb-6 font-sans">
+            <p className="text-white/70 text-xs leading-relaxed mb-6 font-sans">
               {nodesConfig[selectedNode].description}
             </p>
 
             {/* Active Telemetry Values */}
             <div className="space-y-4 mb-6">
-              <h5 className="text-[10px] font-bold text-text-3 uppercase tracking-wider font-mono">Live Readings</h5>
+              <h5 className="text-[10px] font-bold text-white/50 uppercase tracking-wider font-mono">Live Readings</h5>
               
               <div className="grid grid-cols-2 gap-3 font-mono">
-                <div className="bg-surface p-3 rounded-xl border border-border">
-                  <div className="text-[10px] text-text-3 font-bold uppercase">Load Power</div>
-                  <div className="text-base font-bold text-text-1 mt-0.5">
+                <div className="bg-white/[0.03] backdrop-blur-3xl p-3 rounded-xl border border-white/10">
+                  <div className="text-[10px] text-white/50 font-bold uppercase">Load Power</div>
+                  <div className="text-base font-bold text-white mt-0.5">
                     {nodePower} kW
                   </div>
                 </div>
 
-                <div className="bg-surface p-3 rounded-xl border border-border">
-                  <div className="text-[10px] text-text-3 font-bold uppercase">Current</div>
-                  <div className="text-base font-bold text-text-1 mt-0.5">
+                <div className="bg-white/[0.03] backdrop-blur-3xl p-3 rounded-xl border border-white/10">
+                  <div className="text-[10px] text-white/50 font-bold uppercase">Current</div>
+                  <div className="text-base font-bold text-white mt-0.5">
                     {nodeAmps} A
                   </div>
                 </div>
 
-                <div className="bg-surface p-3 rounded-xl border border-border">
-                  <div className="text-[10px] text-text-3 font-bold uppercase">Voltage</div>
-                  <div className="text-base font-bold text-text-1 mt-0.5">
+                <div className="bg-white/[0.03] backdrop-blur-3xl p-3 rounded-xl border border-white/10">
+                  <div className="text-[10px] text-white/50 font-bold uppercase">Voltage</div>
+                  <div className="text-base font-bold text-white mt-0.5">
                     {currentValues.voltage} V
                   </div>
                 </div>
 
-                <div className="bg-surface p-3 rounded-xl border border-border">
-                  <div className="text-[10px] text-text-3 font-bold uppercase">Power Factor</div>
+                <div className="bg-white/[0.03] backdrop-blur-3xl p-3 rounded-xl border border-white/10">
+                  <div className="text-[10px] text-white/50 font-bold uppercase">Power Factor</div>
                   <div className={`text-base font-bold mt-0.5 ${currentPF < 0.85 ? 'text-amber-accent animate-pulse font-bold' : 'text-teal-accent'}`}>
                     {currentPF}
                   </div>
@@ -475,8 +481,8 @@ export default function EnergyFlowVisualizer() {
               </div>
 
               {selectedNode === 'main' && (
-                <div className="bg-surface p-3 rounded-xl border border-border flex justify-between items-center text-xs font-mono">
-                  <span className="text-text-3 font-bold uppercase tracking-wider text-[10px]">Bus Frequency</span>
+                <div className="bg-white/[0.03] backdrop-blur-3xl p-3 rounded-xl border border-white/10 flex justify-between items-center text-xs font-mono">
+                  <span className="text-white/50 font-bold uppercase tracking-wider text-[10px]">Bus Frequency</span>
                   <span className="text-teal-accent font-extrabold">{currentValues.gridFrequency} Hz</span>
                 </div>
               )}
@@ -484,12 +490,12 @@ export default function EnergyFlowVisualizer() {
 
             {/* Sliders */}
             {selectedNode !== 'main' && (
-              <div className="space-y-3 bg-surface p-4 rounded-xl border border-border">
+              <div className="space-y-3 bg-white/[0.03] backdrop-blur-3xl p-4 rounded-xl border border-white/10">
                 <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-text-3 font-bold uppercase tracking-wider text-[10px]">
+                  <span className="text-white/50 font-bold uppercase tracking-wider text-[10px]">
                     {selectedNode === 'solar' ? 'Generation Yield' : 'Demand Load'}
                   </span>
-                  <span className="font-bold text-teal-accent bg-surface-2 px-2 py-0.5 rounded border border-border">
+                  <span className="font-bold text-teal-accent bg-white/[0.02] backdrop-blur-2xl px-2 py-0.5 rounded border border-white/10">
                     {loadLevels[selectedNode]}%
                   </span>
                 </div>
@@ -504,7 +510,7 @@ export default function EnergyFlowVisualizer() {
                   className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-teal-accent disabled:opacity-30"
                 />
 
-                <div className="flex justify-between text-[9px] text-text-3 font-mono">
+                <div className="flex justify-between text-[9px] text-white/50 font-mono">
                   <span>0% (IDLE)</span>
                   <span>100% (MAX)</span>
                 </div>
@@ -512,18 +518,18 @@ export default function EnergyFlowVisualizer() {
             )}
 
             {selectedNode === 'main' && (
-              <div className="bg-surface border border-border p-4 rounded-xl text-xs space-y-2 text-text-2 font-mono">
+              <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-4 rounded-xl text-xs space-y-2 text-white/70 font-mono">
                 <div className="font-bold text-teal-accent flex items-center gap-1">
                   <Settings className="w-3.5 h-3.5 text-teal-accent" /> Facility Incomer Mode
                 </div>
-                <p className="leading-relaxed text-[11px] text-text-2 font-sans">
+                <p className="leading-relaxed text-[11px] text-white/70 font-sans">
                   This meter measures the composite balance. Adjust the specific sub-feed loads in the flow diagram to test how reactive power and grid demand fluctuate in real-time.
                 </p>
               </div>
             )}
           </div>
 
-          <div className="mt-8 pt-4 border-t border-border text-[10px] text-text-3 flex items-center gap-1.5 justify-center font-mono uppercase">
+          <div className="mt-8 pt-4 border-t border-white/10 text-[10px] text-white/50 flex items-center gap-1.5 justify-center font-mono uppercase">
             <Eye className="w-3.5 h-3.5 text-teal-accent" /> Live system view active
           </div>
         </div>
