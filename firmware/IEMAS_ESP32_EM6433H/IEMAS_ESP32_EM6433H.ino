@@ -109,6 +109,9 @@ void checkWiFiConnection() {
     Serial.println("\n[WiFi] Connected! IP: " + WiFi.localIP().toString());
     Serial.printf("[WiFi] Signal RSSI: %d dBm\n", WiFi.RSSI());
     digitalWrite(STATUS_LED, HIGH);
+    
+    // Sync time using NTP (IST: UTC+5:30 = 19800 seconds)
+    configTime(19800, 0, "pool.ntp.org");
   } else {
     Serial.println("\n[WiFi] Connection timeout. Retrying next cycle...");
     digitalWrite(STATUS_LED, LOW);
@@ -321,6 +324,14 @@ void loop() {
     doc["firmware_version"]  = "1.0.0-EM6433H";
     doc["uptime_seconds"]    = millis() / 1000;
     doc["wifi_rssi"]         = WiFi.RSSI();
+
+    // Attach native ESP32 timestamp if synced
+    struct tm timeinfo;
+    if (getLocalTime(&timeinfo, 100)) {
+      char timeStringBuff[35];
+      strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%dT%H:%M:%S+05:30", &timeinfo);
+      doc["timestamp"] = timeStringBuff;
+    }
 
     String jsonPayload;
     serializeJson(doc, jsonPayload);

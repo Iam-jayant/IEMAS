@@ -35,7 +35,7 @@ interface MeterReading {
 export default function MeterDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const meter_id = params.meter_id as string;
+  const meter_id = decodeURIComponent(params.meter_id as string);
 
   const [meter, setMeter] = useState<Meter | null>(null);
   const [latestReading, setLatestReading] = useState<MeterReading | null>(null);
