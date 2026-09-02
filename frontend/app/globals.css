@@ -2,6 +2,9 @@
 
 html {
   zoom: 0.9;
+  width: 111.111%;
+  height: 111.111%;
+  background-color: var(--bg);
 }
 :root {
   /* ── Industrial Dark Palette ── */

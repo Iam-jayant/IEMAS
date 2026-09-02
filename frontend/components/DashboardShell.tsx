@@ -86,7 +86,7 @@ export default function DashboardShell({
   }
 
   return (
-    <div className="h-screen w-screen bg-bg flex p-2 md:p-3 gap-2 md:gap-3 font-sans selection:bg-teal-accent/20 selection:text-teal-accent overflow-hidden">
+    <div className="min-h-screen w-full bg-bg flex p-2 md:p-3 gap-2 md:gap-3 font-sans selection:bg-teal-accent/20 selection:text-teal-accent overflow-hidden">
       <AlertNotification />
 
       {/* Mobile Overlay */}
