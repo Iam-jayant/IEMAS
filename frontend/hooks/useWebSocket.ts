@@ -27,7 +27,7 @@ export interface Alert {
  * WebSocket message types from backend
  */
 interface WebSocketMessage {
-  type: 'alert' | 'connected' | 'pong' | 'system';
+  type: 'alert' | 'connected' | 'pong' | 'system' | 'new_reading';
   timestamp?: string;
   alert?: Alert;
   message?: string;
