@@ -149,11 +149,11 @@ export default function AlertsPage() {
   const getAlertIcon = (type: AlertType) => {
     switch (type) {
       case 'HIGH_POWER':
-        return <Zap className="text-orange-500" size={20} />;
+        return <Zap className="text-amber-accent" size={20} />;
       case 'LOW_POWER_FACTOR':
         return <TrendingDown className="text-yellow-500" size={20} />;
       default:
-        return <AlertTriangle className="text-red-500" size={20} />;
+        return <AlertTriangle className="text-red-accent" size={20} />;
     }
   };
 
@@ -186,7 +186,7 @@ export default function AlertsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-600">Loading alerts...</div>
+        <div className="text-text-2">Loading alerts...</div>
       </div>
     );
   }
@@ -194,8 +194,8 @@ export default function AlertsPage() {
   // Error state
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-red-700">
+      <div className="bg-red-accent/10 border border-red-accent/20 rounded-md p-4">
+        <div className="flex items-center gap-2 text-red-accent">
           <AlertTriangle size={20} />
           <span>Failed to load alerts. Please try again.</span>
         </div>
@@ -208,85 +208,85 @@ export default function AlertsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Alert Management</h1>
-          <p className="text-gray-600 mt-1">
-            {sortedAlerts.length} alert{sortedAlerts.length !== 1 ? 's' : ''} found
+          <h1 className="text-xl font-bold font-display text-text-1 uppercase tracking-wider">Alert Management</h1>
+          <p className="text-text-3 font-mono text-[10px] mt-1 uppercase tracking-wider">
+            {sortedAlerts.length} alert{sortedAlerts.length !== 1 ? 's' : ''} active in registry
           </p>
         </div>
 
         <button
           onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-surface-2 hover:border-teal-accent/40 text-text-2 hover:text-text-1 font-mono text-xs uppercase font-bold tracking-wider rounded-sm border border-border transition-all cursor-pointer"
         >
-          <RefreshCw size={18} />
-          Refresh
+          <RefreshCw size={14} />
+          Sync
         </button>
       </div>
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <div className="glass rounded-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">Total Alerts</p>
-              <p className="text-2xl font-bold text-gray-900">{alerts.length}</p>
+              <p className="text-text-2 text-sm">Total Alerts</p>
+              <p className="text-2xl font-bold text-text-1">{alerts.length}</p>
             </div>
-            <AlertTriangle className="text-gray-400" size={24} />
+            <AlertTriangle className="text-text-3" size={24} />
           </div>
         </div>
 
-        <div className="bg-white border-2 border-orange-200 rounded-lg p-4">
+        <div className="glass border border-amber-accent/20 rounded-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">Active</p>
-              <p className="text-2xl font-bold text-orange-600">
+              <p className="text-text-2 text-sm">Active</p>
+              <p className="text-2xl font-bold text-amber-accent">
                 {alerts.filter((a: Alert) => !a.dismissed && !a.acknowledged).length}
               </p>
             </div>
-            <AlertTriangle className="text-orange-500" size={24} />
+            <AlertTriangle className="text-amber-accent" size={24} />
           </div>
         </div>
 
-        <div className="bg-white border-2 border-blue-200 rounded-lg p-4">
+        <div className="glass border border-blue-500/20 rounded-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">Acknowledged</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-text-2 text-sm">Acknowledged</p>
+              <p className="text-2xl font-bold text-blue-400">
                 {alerts.filter((a: Alert) => a.acknowledged && !a.dismissed).length}
               </p>
             </div>
-            <Check className="text-blue-500" size={24} />
+            <Check className="text-blue-400" size={24} />
           </div>
         </div>
 
-        <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
+        <div className="glass rounded-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">Dismissed</p>
-              <p className="text-2xl font-bold text-gray-600">
+              <p className="text-text-2 text-sm">Dismissed</p>
+              <p className="text-2xl font-bold text-text-2">
                 {alerts.filter((a: Alert) => a.dismissed).length}
               </p>
             </div>
-            <X className="text-gray-500" size={24} />
+            <X className="text-text-3" size={24} />
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter size={20} className="text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+      <div className="glass rounded-md p-5">
+        <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border">
+          <Filter size={16} className="text-teal-accent" />
+          <h2 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider">Telemetry Filters</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Meter Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Meter</label>
+            <label className="block text-[10px] font-mono font-bold text-text-3 uppercase tracking-wider mb-1.5">Meter Node</label>
             <select
               value={filterMeter}
               onChange={(e) => setFilterMeter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#019CDF]"
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-sm focus:outline-none focus:border-teal-accent/50 text-xs font-mono text-text-1 cursor-pointer transition-all"
             >
               <option value="">All Meters</option>
               {meters.map((meter: any) => (
@@ -299,11 +299,11 @@ export default function AlertsPage() {
 
           {/* Type Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Alert Type</label>
+            <label className="block text-[10px] font-mono font-bold text-text-3 uppercase tracking-wider mb-1.5">Alert Vector</label>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as AlertType | '')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#019CDF]"
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-sm focus:outline-none focus:border-teal-accent/50 text-xs font-mono text-text-1 cursor-pointer transition-all"
             >
               <option value="">All Types</option>
               <option value="HIGH_POWER">High Power</option>
@@ -313,11 +313,11 @@ export default function AlertsPage() {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-[10px] font-mono font-bold text-text-3 uppercase tracking-wider mb-1.5">State</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#019CDF]"
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-sm focus:outline-none focus:border-teal-accent/50 text-xs font-mono text-text-1 cursor-pointer transition-all"
             >
               <option value="all">All</option>
               <option value="active">Active</option>
@@ -328,23 +328,23 @@ export default function AlertsPage() {
 
           {/* Start Date Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <label className="block text-[10px] font-mono font-bold text-text-3 uppercase tracking-wider mb-1.5">Origin Epoch</label>
             <input
               type="datetime-local"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#019CDF]"
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-sm focus:outline-none focus:border-teal-accent/50 text-xs font-mono text-text-1 cursor-pointer transition-all [color-scheme:dark]"
             />
           </div>
 
           {/* End Date Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <label className="block text-[10px] font-mono font-bold text-text-3 uppercase tracking-wider mb-1.5">Terminal Epoch</label>
             <input
               type="datetime-local"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#019CDF]"
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-sm focus:outline-none focus:border-teal-accent/50 text-xs font-mono text-text-1 cursor-pointer transition-all [color-scheme:dark]"
             />
           </div>
         </div>
@@ -360,21 +360,21 @@ export default function AlertsPage() {
                 setStartDate('');
                 setEndDate('');
               }}
-              className="text-sm text-[#019CDF] hover:text-[#0284C7] font-medium"
+              className="text-[10px] font-mono uppercase font-bold text-teal-accent hover:text-teal-accent/80 tracking-wider transition-all cursor-pointer"
             >
-              Clear all filters
+              Clear registry filters
             </button>
           </div>
         )}
       </div>
 
       {/* Alerts Table */}
-      <div className="bg-white border-2 border-gray-200 rounded-lg overflow-hidden">
+      <div className="glass rounded-md overflow-hidden">
         {sortedAlerts.length === 0 ? (
           <div className="p-12 text-center">
-            <AlertTriangle size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No alerts found</h3>
-            <p className="text-gray-600">
+            <AlertTriangle size={48} className="mx-auto text-text-3 mb-4" />
+            <h3 className="text-lg font-semibold text-text-1 mb-2">No alerts found</h3>
+            <p className="text-text-2">
               {filterMeter || filterType || filterStatus !== 'all' || startDate || endDate
                 ? 'Try adjusting your filters'
                 : 'No alerts have been generated yet'}
@@ -383,12 +383,12 @@ export default function AlertsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b-2 border-gray-200">
+              <thead className="bg-surface-2 border-b-2 border-border">
                 <tr>
                   <th className="px-4 py-3 text-left">
                     <button
                       onClick={() => handleSort('timestamp')}
-                      className="flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                      className="flex items-center gap-1 text-sm font-semibold text-text-2 hover:text-text-1"
                     >
                       Timestamp
                       {sortField === 'timestamp' &&
@@ -402,7 +402,7 @@ export default function AlertsPage() {
                   <th className="px-4 py-3 text-left">
                     <button
                       onClick={() => handleSort('meter_id')}
-                      className="flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                      className="flex items-center gap-1 text-sm font-semibold text-text-2 hover:text-text-1"
                     >
                       Meter ID
                       {sortField === 'meter_id' &&
@@ -416,7 +416,7 @@ export default function AlertsPage() {
                   <th className="px-4 py-3 text-left">
                     <button
                       onClick={() => handleSort('alert_type')}
-                      className="flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                      className="flex items-center gap-1 text-sm font-semibold text-text-2 hover:text-text-1"
                     >
                       Type
                       {sortField === 'alert_type' &&
@@ -430,7 +430,7 @@ export default function AlertsPage() {
                   <th className="px-4 py-3 text-left">
                     <button
                       onClick={() => handleSort('measured_value')}
-                      className="flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                      className="flex items-center gap-1 text-sm font-semibold text-text-2 hover:text-text-1"
                     >
                       Measured Value
                       {sortField === 'measured_value' &&
@@ -442,44 +442,44 @@ export default function AlertsPage() {
                     </button>
                   </th>
                   <th className="px-4 py-3 text-left">
-                    <span className="text-sm font-semibold text-gray-700">Threshold</span>
+                    <span className="text-sm font-semibold text-text-2">Threshold</span>
                   </th>
                   <th className="px-4 py-3 text-left">
-                    <span className="text-sm font-semibold text-gray-700">Status</span>
+                    <span className="text-sm font-semibold text-text-2">Status</span>
                   </th>
                   <th className="px-4 py-3 text-right">
-                    <span className="text-sm font-semibold text-gray-700">Actions</span>
+                    <span className="text-sm font-semibold text-text-2">Actions</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {sortedAlerts.map((alert: Alert) => (
-                  <tr key={alert.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">
+                  <tr key={alert.id} className="hover:bg-surface-2 transition-colors">
+                    <td className="px-4 py-3 text-sm text-text-1">
                       {formatTimestamp(alert.timestamp)}
                     </td>
-                    <td className="px-4 py-3 text-sm font-mono text-gray-900">
+                    <td className="px-4 py-3 text-sm font-mono text-text-1">
                       {alert.meter_id}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {getAlertIcon(alert.alert_type)}
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-text-1">
                           {formatAlertType(alert.alert_type)}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                    <td className="px-4 py-3 text-sm font-semibold text-text-1">
                       {alert.measured_value.toFixed(2)}
                       {alert.alert_type === 'HIGH_POWER' ? ' kW' : ''}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-text-2">
                       {alert.threshold_value.toFixed(2)}
                       {alert.alert_type === 'HIGH_POWER' ? ' kW' : ''}
                     </td>
                     <td className="px-4 py-3">
                       {alert.dismissed ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-surface-2 text-text-2 text-xs font-medium rounded">
                           <X size={14} />
                           Dismissed
                         </span>
@@ -500,7 +500,7 @@ export default function AlertsPage() {
                         {!alert.acknowledged && !alert.dismissed && (
                           <button
                             onClick={() => handleAcknowledge(alert.id)}
-                            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded transition-colors"
+                            className="px-3 py-1 bg-blue-500/100 hover:bg-blue-600 text-white text-xs font-medium rounded transition-colors"
                             title="Acknowledge alert"
                           >
                             Acknowledge
@@ -509,7 +509,7 @@ export default function AlertsPage() {
                         {!alert.dismissed && (
                           <button
                             onClick={() => handleDismiss(alert.id)}
-                            className="px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white text-xs font-medium rounded transition-colors"
+                            className="px-3 py-1 bg-surface-20 hover:bg-gray-600 text-white text-xs font-medium rounded transition-colors"
                             title="Dismiss alert"
                           >
                             Dismiss

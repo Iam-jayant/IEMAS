@@ -124,7 +124,7 @@ export default function HistoricalDataPage() {
       </div>
 
       {/* ───────── Filters Section ───────── */}
-      <div className="bg-surface border border-border rounded-3xl p-6 space-y-5">
+      <div className="bg-surface border border-border rounded-md p-6 space-y-5">
         <div className="flex items-center gap-2 mb-2">
           <Filter className="w-4 h-4 text-teal-accent" />
           <h2 className="text-sm font-display font-bold text-text-1">Filter Options</h2>
@@ -145,7 +145,7 @@ export default function HistoricalDataPage() {
               <button
                 key={days}
                 onClick={() => setDateRange(days)}
-                className="px-4 py-2.5 bg-surface-2 hover:bg-teal-accent/10 text-text-2 hover:text-teal-accent border border-border hover:border-teal-accent/50 rounded-xl transition-all text-sm font-medium"
+                className="px-4 py-2.5 bg-surface-2 hover:bg-teal-accent/10 text-text-2 hover:text-teal-accent border border-border hover:border-teal-accent/50 rounded-md transition-all text-sm font-medium"
               >
                 {label}
               </button>
@@ -165,7 +165,7 @@ export default function HistoricalDataPage() {
               value={meterId}
               onChange={(e) => setMeterId(e.target.value)}
               placeholder="e.g., METER001"
-              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-text-1 font-mono text-sm placeholder:text-text-3 focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
+              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-md text-text-1 font-mono text-sm placeholder:text-text-3 focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function HistoricalDataPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
+              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-md text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
             />
           </div>
 
@@ -193,7 +193,7 @@ export default function HistoricalDataPage() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
+              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-md text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
             />
           </div>
 
@@ -205,7 +205,7 @@ export default function HistoricalDataPage() {
             <select
               value={limit}
               onChange={(e) => setLimit(Number(e.target.value))}
-              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
+              className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-md text-text-1 font-mono text-sm focus:outline-none focus:border-teal-accent focus:ring-1 focus:ring-teal-accent/50 transition-all"
             >
               <option value="100">100</option>
               <option value="500">500</option>
@@ -220,14 +220,14 @@ export default function HistoricalDataPage() {
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             onClick={handleSearch}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-accent hover:bg-teal-accent/90 text-bg font-semibold rounded-xl transition-all text-sm shadow-lg shadow-teal-accent/20"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-accent hover:bg-teal-accent/90 text-bg font-semibold rounded-md transition-all text-sm shadow-lg shadow-teal-accent/20"
           >
             <Search size={16} />
             Search
           </button>
           <button
             onClick={handleReset}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-surface-2 hover:bg-red-accent/10 text-text-2 hover:text-red-accent border border-border hover:border-red-accent/50 rounded-xl transition-all text-sm"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-surface-2 hover:bg-red-accent/10 text-text-2 hover:text-red-accent border border-border hover:border-red-accent/50 rounded-md transition-all text-sm"
           >
             <RotateCcw size={16} />
             Reset
@@ -237,7 +237,7 @@ export default function HistoricalDataPage() {
 
       {/* ───────── Results Section ───────── */}
       {shouldFetch && (
-        <div className="bg-surface border border-border rounded-3xl p-6">
+        <div className="bg-surface border border-border rounded-md p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
             <div>
               <h2 className="text-sm font-display font-bold text-text-1">
@@ -253,7 +253,7 @@ export default function HistoricalDataPage() {
               <button
                 onClick={() => handleExport('csv')}
                 disabled={readings.length === 0}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/90 hover:bg-green-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-xl transition-all text-sm font-medium shadow-lg shadow-green-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/90 hover:bg-green-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-md transition-all text-sm font-medium shadow-lg shadow-green-600/20"
               >
                 <FileSpreadsheet size={16} />
                 Export CSV
@@ -261,7 +261,7 @@ export default function HistoricalDataPage() {
               <button
                 onClick={() => handleExport('json')}
                 disabled={readings.length === 0}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/90 hover:bg-blue-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-xl transition-all text-sm font-medium shadow-lg shadow-blue-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/90 hover:bg-blue-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-md transition-all text-sm font-medium shadow-lg shadow-blue-600/20"
               >
                 <FileJson size={16} />
                 Export JSON
@@ -269,7 +269,7 @@ export default function HistoricalDataPage() {
               <button
                 onClick={handlePrint}
                 disabled={readings.length === 0}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600/90 hover:bg-violet-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-xl transition-all text-sm font-medium shadow-lg shadow-violet-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600/90 hover:bg-violet-600 disabled:bg-surface-2 disabled:text-text-3 disabled:cursor-not-allowed text-white rounded-md transition-all text-sm font-medium shadow-lg shadow-violet-600/20"
               >
                 <Printer size={16} />
                 Print
@@ -287,7 +287,7 @@ export default function HistoricalDataPage() {
 
           {/* Error State */}
           {error && (
-            <div className="bg-red-accent/10 border border-red-accent/30 rounded-2xl p-4 text-red-accent">
+            <div className="bg-red-accent/10 border border-red-accent/30 rounded-md p-4 text-red-accent">
               <p className="font-semibold text-sm">Failed to load readings</p>
               <p className="text-xs mt-1 opacity-80">Please check your filters and try again.</p>
             </div>

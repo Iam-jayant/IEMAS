@@ -240,7 +240,7 @@ export default function AnalyticsPage() {
       {/* ───────── Charts Row 1 ───────── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Area – 24h Power Trend */}
-        <div className="xl:col-span-2 bg-surface border border-border rounded-3xl p-5">
+        <div className="xl:col-span-2 bg-surface border border-border rounded-md p-5">
           <h3 className="text-sm font-display font-bold text-text-1 mb-4">24-Hour Power Trend</h3>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={trendData}>
@@ -267,7 +267,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Pie – Power Distribution */}
-        <div className="bg-surface border border-border rounded-3xl p-5">
+        <div className="bg-surface border border-border rounded-md p-5">
           <h3 className="text-sm font-display font-bold text-text-1 mb-4">Power Distribution</h3>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -308,7 +308,7 @@ export default function AnalyticsPage() {
       {/* ───────── Charts Row 2 ───────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Bar – Per-Meter Active Power */}
-        <div className="bg-surface border border-border rounded-3xl p-5">
+        <div className="bg-surface border border-border rounded-md p-5">
           <h3 className="text-sm font-display font-bold text-text-1 mb-4">Active Power by Meter</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={meterBars} barSize={36}>
@@ -333,7 +333,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Bar – Cumulative Energy by Meter */}
-        <div className="bg-surface border border-border rounded-3xl p-5">
+        <div className="bg-surface border border-border rounded-md p-5">
           <h3 className="text-sm font-display font-bold text-text-1 mb-4">Cumulative Energy by Meter</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={meterBars} barSize={36}>
@@ -359,7 +359,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ───────── Meter Detail Table ───────── */}
-      <div className="bg-surface border border-border rounded-3xl p-5 overflow-x-auto">
+      <div className="bg-surface border border-border rounded-md p-5 overflow-x-auto">
         <h3 className="text-sm font-display font-bold text-text-1 mb-4">Meter Readings Summary</h3>
         <table className="w-full text-left text-sm">
           <thead>
@@ -416,9 +416,9 @@ function KPICard({
   const isPositive = delta >= 0;
 
   return (
-    <div className="bg-surface border border-border rounded-3xl p-5 flex flex-col gap-3">
+    <div className="bg-surface border border-border rounded-md p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className={`flex items-center justify-center w-9 h-9 rounded-xl ${a.bg} ${a.text}`}>{icon}</span>
+        <span className={`flex items-center justify-center w-9 h-9 rounded-md ${a.bg} ${a.text}`}>{icon}</span>
         <span
           className={`inline-flex items-center gap-0.5 text-xs font-mono font-bold ${
             isPositive ? 'text-teal-accent' : 'text-red-accent'
