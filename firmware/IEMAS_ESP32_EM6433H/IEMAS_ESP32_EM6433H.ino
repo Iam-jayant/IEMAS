@@ -10,8 +10,7 @@ const char* WIFI_SSID     = "pattagobi";
 const char* WIFI_PASSWORD = "12345@678";
 
 // Backend URL: Point to your backend server running IEMAS
-// Using your laptop's current IP address on the phone hotspot
-const char* BACKEND_URL   = "http://172.23.37.142:8000/api/readings";
+const char* BACKEND_URL   = "https://iemas.onrender.com/api/readings";
 
 // Meter Identifier (matches registered meter in IEMAS dashboard)
 const char* METER_ID      = "CNC DX 250";

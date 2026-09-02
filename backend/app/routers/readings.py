@@ -121,7 +121,7 @@ async def create_reading(
         # Broadcast live reading to connected WebSocket clients (sub-second UI update)
         reading_dict = reading.model_dump() if hasattr(reading, "model_dump") else reading.dict()
         if isinstance(reading_dict.get("timestamp"), datetime):
-            reading_dict["timestamp"] = reading_dict["timestamp"].isoformat()
+            reading_dict["timestamp"] = reading_dict["timestamp"].isoformat() + "Z"
         reading_dict["id"] = db_reading.id
         background_tasks.add_task(broadcast_reading_to_clients, reading_dict)
         
@@ -131,7 +131,7 @@ async def create_reading(
             data={
                 "reading_id": db_reading.id,
                 "meter_id": db_reading.meter_id,
-                "timestamp": db_reading.timestamp.isoformat()
+                "timestamp": db_reading.timestamp.isoformat() + "Z"
             }
         )
         
