@@ -16,8 +16,18 @@ interface Meter {
 interface MeterReading {
   meter_id: string;
   timestamp: string;
-  voltage: number;
-  current: number;
+  current_r: number;
+  current_y: number;
+  current_b: number;
+  current_avg: number;
+  voltage_ry: number;
+  voltage_yb: number;
+  voltage_br: number;
+  voltage_ll_avg: number;
+  voltage_rn: number;
+  voltage_yn: number;
+  voltage_bn: number;
+  voltage_ln_avg: number;
   active_power: number;
   power_factor: number;
   frequency: number;

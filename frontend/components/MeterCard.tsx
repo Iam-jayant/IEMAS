@@ -20,8 +20,18 @@ interface Meter {
 interface MeterReading {
   meter_id: string;
   timestamp: string;
-  voltage: number;
-  current: number;
+  current_r: number;
+  current_y: number;
+  current_b: number;
+  current_avg: number;
+  voltage_ry: number;
+  voltage_yb: number;
+  voltage_br: number;
+  voltage_ll_avg: number;
+  voltage_rn: number;
+  voltage_yn: number;
+  voltage_bn: number;
+  voltage_ln_avg: number;
   active_power: number;
   power_factor: number;
   frequency: number;
@@ -138,17 +148,17 @@ export default function MeterCard({ meter, latestReading, status, onClick }: Met
           <div className="grid grid-cols-2 gap-2">
             {/* Voltage */}
             <div className="bg-surface-2 rounded-sm p-2.5">
-              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Voltage</p>
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Voltage L-L Avg</p>
               <p className="font-mono font-bold text-text-1 text-base mt-0.5 tabular-nums">
-                {latestReading.voltage.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">V</span>
+                {latestReading.voltage_ll_avg.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">V</span>
               </p>
             </div>
             
             {/* Current */}
             <div className="bg-surface-2 rounded-sm p-2.5">
-              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Current</p>
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Current Avg</p>
               <p className="font-mono font-bold text-text-1 text-base mt-0.5 tabular-nums">
-                {latestReading.current.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">A</span>
+                {latestReading.current_avg.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">A</span>
               </p>
             </div>
             

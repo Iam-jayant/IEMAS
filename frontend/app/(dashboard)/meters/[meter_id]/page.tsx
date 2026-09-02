@@ -19,8 +19,18 @@ interface MeterReading {
   id: number;
   meter_id: string;
   timestamp: string;
-  voltage: number;
-  current: number;
+  current_r: number;
+  current_y: number;
+  current_b: number;
+  current_avg: number;
+  voltage_ry: number;
+  voltage_yb: number;
+  voltage_br: number;
+  voltage_ll_avg: number;
+  voltage_rn: number;
+  voltage_yn: number;
+  voltage_bn: number;
+  voltage_ln_avg: number;
   active_power: number;
   reactive_power: number;
   apparent_power: number;
@@ -216,19 +226,19 @@ export default function MeterDetailPage() {
           
           <div className="glass rounded-md p-5 glow-teal group transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Voltage</p>
+              <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Voltage L-L Avg</p>
               <Zap className="text-amber-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.voltage.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.voltage_ll_avg.toFixed(1)}</p>
             <p className="text-text-3 text-[10px] font-mono font-bold mt-1">VOLTS (V)</p>
           </div>
 
           <div className="glass rounded-md p-5 glow-teal group transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Current</p>
+              <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Current Avg</p>
               <Activity className="text-teal-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.current.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.current_avg.toFixed(1)}</p>
             <p className="text-text-3 text-[10px] font-mono font-bold mt-1">AMPERES (A)</p>
           </div>
 
@@ -352,7 +362,7 @@ export default function MeterDetailPage() {
 
           {/* Voltage Chart */}
           <div className="glass rounded-md p-5">
-            <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Line Voltage Registry (V)</h3>
+            <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Line-to-Line Voltage Registry (V)</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={historicalData} margin={{ left: -20, right: 10, top: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -367,7 +377,9 @@ export default function MeterDetailPage() {
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
                   labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
-                <Line type="monotone" dataKey="voltage" stroke="var(--amber)" strokeWidth={2} dot={false} name="Voltage (V)" />
+                <Line type="monotone" dataKey="voltage_ry" stroke="#EF4444" strokeWidth={2} dot={false} name="R-Y Voltage (V)" />
+                <Line type="monotone" dataKey="voltage_yb" stroke="#EAB308" strokeWidth={2} dot={false} name="Y-B Voltage (V)" />
+                <Line type="monotone" dataKey="voltage_br" stroke="#3B82F6" strokeWidth={2} dot={false} name="B-R Voltage (V)" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -389,7 +401,9 @@ export default function MeterDetailPage() {
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: 'var(--border)', fontSize: '10px' }}
                   labelFormatter={(ts: any) => formatTimestamp(ts as string)}
                 />
-                <Line type="monotone" dataKey="current" stroke="#3B82F6" strokeWidth={2} dot={false} name="Current (A)" />
+                <Line type="monotone" dataKey="current_r" stroke="#EF4444" strokeWidth={2} dot={false} name="Phase R (A)" />
+                <Line type="monotone" dataKey="current_y" stroke="#EAB308" strokeWidth={2} dot={false} name="Phase Y (A)" />
+                <Line type="monotone" dataKey="current_b" stroke="#3B82F6" strokeWidth={2} dot={false} name="Phase B (A)" />
               </LineChart>
             </ResponsiveContainer>
           </div>
