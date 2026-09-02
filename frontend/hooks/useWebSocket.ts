@@ -177,6 +177,10 @@ export function useWebSocket(url: string): UseWebSocketReturn {
             case 'system':
               console.log('[WebSocket] System message:', message.data);
               break;
+              
+            case 'new_reading':
+              // Handled by UI polling currently, could update cache here in future
+              break;
             
             default:
               console.warn('[WebSocket] Unknown message type:', message.type);
