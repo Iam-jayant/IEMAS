@@ -128,7 +128,7 @@ export default function MeterDetailPage() {
   };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
+    return new Date(timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
   };
 
   const formatUptime = (seconds?: number) => {
@@ -141,7 +141,7 @@ export default function MeterDetailPage() {
 
   if (isLoading && !meter) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3 bg-surface border border-border rounded-3xl p-8 max-w-7xl mx-auto">
+      <div className="flex flex-col items-center justify-center h-64 gap-3 glass rounded-md p-8 max-w-7xl mx-auto">
         <Activity className="animate-spin text-teal-accent" size={32} />
         <div className="text-text-3 font-mono text-[11px] uppercase tracking-widest font-bold">Retrieving Node Details...</div>
       </div>
@@ -158,11 +158,11 @@ export default function MeterDetailPage() {
           <ArrowLeft size={16} />
           Back to Meters
         </button>
-        <div className="bg-red-accent/5 border border-red-accent/20 rounded-3xl p-5 text-center">
+        <div className="glass rounded-md p-5 text-center border-red-accent/20">
           <div className="flex flex-col items-center gap-2 text-red-accent">
             <AlertTriangle size={32} />
             <h3 className="text-sm font-bold font-mono uppercase tracking-wider">Telemetry Link Failure</h3>
-            <p className="text-xs text-text-2 font-sans">{error}</p>
+            <p className="text-xs text-text-3 font-sans">{error}</p>
           </div>
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function MeterDetailPage() {
           <ArrowLeft size={16} />
           Back to Meters
         </button>
-        <div className="text-center text-text-3 font-mono text-[11px] uppercase font-bold py-12 bg-surface border border-border rounded-3xl">
+        <div className="text-center text-text-3 font-mono text-[11px] uppercase font-bold py-12 glass rounded-md">
           Node not found
         </div>
       </div>
@@ -193,7 +193,7 @@ export default function MeterDetailPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/meters')}
-            className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-text-2 hover:text-text-1 hover:border-teal-accent/40 hover:bg-surface-2 transition-all cursor-pointer"
+            className="w-10 h-10 rounded-sm glass flex items-center justify-center text-text-2 hover:text-text-1 hover:border-teal-accent/40 transition-all cursor-pointer"
           >
             <ArrowLeft size={16} />
           </button>
@@ -204,7 +204,7 @@ export default function MeterDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-surface border border-border rounded-full select-none">
+        <div className="flex items-center gap-1.5 px-3.5 py-1.5 glass rounded-sm select-none">
           <span className={`w-1.5 h-1.5 rounded-full ${getStatusColor(status)}`}></span>
           <span className="text-[10px] font-mono text-text-2 uppercase font-bold tracking-wider">{status}</span>
         </div>
@@ -214,67 +214,67 @@ export default function MeterDetailPage() {
       {latestReading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5 glow-teal group transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Voltage</p>
               <Zap className="text-amber-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-text-1 font-mono">{latestReading.voltage.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.voltage.toFixed(1)}</p>
             <p className="text-text-3 text-[10px] font-mono font-bold mt-1">VOLTS (V)</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5 glow-teal group transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Current</p>
               <Activity className="text-teal-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-text-1 font-mono">{latestReading.current.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.current.toFixed(1)}</p>
             <p className="text-text-3 text-[10px] font-mono font-bold mt-1">AMPERES (A)</p>
           </div>
 
-          <div className="bg-teal-accent/5 border border-teal-accent/20 rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5 border-teal-accent/20 glow-teal group transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <p className="text-teal-accent text-[10px] font-bold uppercase tracking-wider font-mono">Active Power</p>
               <Power className="text-teal-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-teal-accent font-mono">{latestReading.active_power.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-teal-accent font-mono tabular-nums">{latestReading.active_power.toFixed(1)}</p>
             <p className="text-teal-accent/70 text-[10px] font-mono font-bold mt-1">KILOWATTS (kW)</p>
           </div>
 
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5 transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <p className="text-text-3 text-[10px] font-bold uppercase tracking-wider font-mono">Power Factor</p>
               <Gauge className="text-violet-accent" size={18} />
             </div>
-            <p className="text-2xl font-bold text-text-1 font-mono">{latestReading.power_factor.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-text-1 font-mono tabular-nums">{latestReading.power_factor.toFixed(2)}</p>
             <p className="text-text-3 text-[10px] font-mono font-bold mt-1">RATIO (PF)</p>
           </div>
 
         </div>
       ) : (
-        <div className="bg-amber-accent/5 border border-amber-accent/20 rounded-3xl p-5 text-center">
+        <div className="glass rounded-md p-5 text-center border-amber-accent/20">
           <p className="text-xs text-amber-accent font-mono uppercase font-bold tracking-wider">No active readings telemetry stream</p>
         </div>
       )}
 
       {/* Detailed Parameters Grid */}
       {latestReading && (
-        <div className="bg-surface border border-border rounded-3xl p-6 shadow-sm">
+        <div className="glass rounded-md p-6">
           <h2 className="text-sm font-bold font-display text-text-1 uppercase tracking-wider mb-5">Telemetry Vector Registers</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-surface-2 border border-border p-3.5 rounded-2xl">
+            <div className="bg-surface-2 rounded-md p-3.5 border border-border">
               <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Reactive Power</p>
               <p className="text-sm font-bold font-mono text-text-1 mt-1">{latestReading.reactive_power.toFixed(1)} kVAR</p>
             </div>
-            <div className="bg-surface-2 border border-border p-3.5 rounded-2xl">
+            <div className="bg-surface-2 rounded-md p-3.5 border border-border">
               <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Apparent Power</p>
               <p className="text-sm font-bold font-mono text-text-1 mt-1">{latestReading.apparent_power.toFixed(1)} kVA</p>
             </div>
-            <div className="bg-surface-2 border border-border p-3.5 rounded-2xl">
+            <div className="bg-surface-2 rounded-md p-3.5 border border-border">
               <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Frequency</p>
               <p className="text-sm font-bold font-mono text-text-1 mt-1">{latestReading.frequency.toFixed(2)} Hz</p>
             </div>
-            <div className="bg-surface-2 border border-border p-3.5 rounded-2xl">
+            <div className="bg-surface-2 rounded-md p-3.5 border border-border">
               <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Total Net Accumulator</p>
               <p className="text-sm font-bold font-mono text-text-1 mt-1">{latestReading.cumulative_energy.toFixed(2)} kWh</p>
             </div>
@@ -285,12 +285,12 @@ export default function MeterDetailPage() {
       {/* Time Range Selector */}
       <div className="flex items-center gap-3">
         <span className="text-xs font-mono uppercase font-bold text-text-3 tracking-wider">Time Range:</span>
-        <div className="flex gap-1.5 bg-surface border border-border p-1 rounded-full shadow-sm">
+        <div className="flex gap-1.5 glass rounded-md p-1 shadow-sm">
           {(['1h', '24h', '7d'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-4 py-1.5 rounded-full text-xs font-mono font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              className={`px-4 py-1.5 rounded-sm text-xs font-mono font-bold transition-all uppercase tracking-wider cursor-pointer ${
                 timeRange === range
                   ? 'bg-teal-accent text-bg shadow-sm'
                   : 'text-text-2 hover:text-text-1 hover:bg-surface-2/60'
@@ -307,14 +307,14 @@ export default function MeterDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Power Chart */}
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5">
             <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Active Power Log (kW)</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={historicalData} margin={{ left: -20, right: 10, top: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="timestamp"
-                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                   stroke="var(--text-3)"
                   style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }}
                 />
@@ -329,14 +329,14 @@ export default function MeterDetailPage() {
           </div>
 
           {/* Power Factor Chart */}
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5">
             <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Power Factor Register Log</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={historicalData} margin={{ left: -20, right: 10, top: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="timestamp"
-                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                   stroke="var(--text-3)"
                   style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }}
                 />
@@ -351,14 +351,14 @@ export default function MeterDetailPage() {
           </div>
 
           {/* Voltage Chart */}
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5">
             <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Line Voltage Registry (V)</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={historicalData} margin={{ left: -20, right: 10, top: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="timestamp"
-                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                   stroke="var(--text-3)"
                   style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }}
                 />
@@ -373,14 +373,14 @@ export default function MeterDetailPage() {
           </div>
 
           {/* Current Chart */}
-          <div className="bg-surface border border-border rounded-3xl p-5 shadow-sm">
+          <div className="glass rounded-md p-5">
             <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Phase Current Vectors (A)</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={historicalData} margin={{ left: -20, right: 10, top: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="timestamp"
-                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  tickFormatter={(ts) => new Date(ts).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                   stroke="var(--text-3)"
                   style={{ fontSize: '9px', fontFamily: 'var(--font-jetbrains-mono)' }}
                 />
@@ -396,7 +396,7 @@ export default function MeterDetailPage() {
 
         </div>
       ) : (
-        <div className="bg-surface border border-border rounded-3xl p-12 text-center shadow-sm">
+        <div className="glass rounded-md p-12 text-center">
           <p className="text-xs text-text-3 font-mono font-bold uppercase tracking-wider">No registry logs available for chosen range</p>
         </div>
       )}
@@ -407,7 +407,7 @@ export default function MeterDetailPage() {
       {/* Meter Configuration and Firmware Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <div className="bg-surface border border-border rounded-3xl p-6 shadow-sm">
+        <div className="glass rounded-md p-6">
           <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Modbus Configuration</h3>
           <div className="space-y-3.5 text-xs">
             <div className="flex justify-between border-b border-border pb-2 font-mono">
@@ -425,7 +425,7 @@ export default function MeterDetailPage() {
           </div>
         </div>
 
-        <div className="bg-surface border border-border rounded-3xl p-6 shadow-sm">
+        <div className="glass rounded-md p-6">
           <h3 className="text-xs font-bold font-display text-text-1 uppercase tracking-wider mb-4">Microcontroller Diagnostics</h3>
           <div className="space-y-3.5 text-xs">
             <div className="flex justify-between border-b border-border pb-2 font-mono">

@@ -7,8 +7,7 @@ import { Wifi, WifiOff, Cpu, Clock } from 'lucide-react';
  * IEMAS - Meter Card Component
  * 
  * Displays real-time meter status and electrical parameters.
- * Industrial SCADA-inspired design for dashboard and meters list views.
- * Updated to use VoltSense/IEMAS light theme variables and typography.
+ * Dark industrial glassmorphism design.
  */
 
 interface Meter {
@@ -41,25 +40,29 @@ interface MeterCardProps {
 export default function MeterCard({ meter, latestReading, status, onClick }: MeterCardProps) {
   const router = useRouter();
 
-  const getStatusColor = (status: string) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case 'online':
-        return 'bg-teal-accent shadow-[0_0_8px_rgba(13,148,136,0.4)]';
+        return {
+          dot: 'bg-teal-accent shadow-[0_0_6px_rgba(52,211,153,0.5)]',
+          text: 'text-teal-accent',
+          bg: 'bg-teal-accent/8 border-teal-accent/15',
+          label: 'Online',
+        };
       case 'offline':
-        return 'bg-red-accent shadow-[0_0_8px_rgba(225,29,72,0.4)]';
+        return {
+          dot: 'bg-red-accent shadow-[0_0_6px_rgba(248,113,113,0.5)] animate-pulse',
+          text: 'text-red-accent',
+          bg: 'bg-red-accent/8 border-red-accent/15',
+          label: 'Offline',
+        };
       default:
-        return 'bg-text-3';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'online':
-        return 'Online';
-      case 'offline':
-        return 'Offline';
-      default:
-        return 'Unknown';
+        return {
+          dot: 'bg-text-3',
+          text: 'text-text-3',
+          bg: 'bg-surface-2 border-border',
+          label: 'Unknown',
+        };
     }
   };
 
@@ -76,17 +79,24 @@ export default function MeterCard({ meter, latestReading, status, onClick }: Met
     return parts.length > 0 ? parts.join(' ') : '0m';
   };
 
-  const getWiFiSignal = (rssi?: number): { label: string; color: string; Icon: typeof Wifi } => {
-    if (!rssi) {
-      return { label: 'Unknown', color: 'text-text-3', Icon: WifiOff };
-    }
-    if (rssi >= -60) {
-      return { label: 'Good', color: 'text-teal-accent', Icon: Wifi };
-    } else if (rssi >= -70) {
-      return { label: 'Fair', color: 'text-amber-accent', Icon: Wifi };
-    } else {
-      return { label: 'Poor', color: 'text-red-accent', Icon: Wifi };
-    }
+  const getWiFiSignal = (rssi?: number) => {
+    if (!rssi) return { label: '—', color: 'text-text-3', Icon: WifiOff };
+    if (rssi >= -60) return { label: 'Good', color: 'text-teal-accent', Icon: Wifi };
+    if (rssi >= -70) return { label: 'Fair', color: 'text-amber-accent', Icon: Wifi };
+    return { label: 'Poor', color: 'text-red-accent', Icon: Wifi };
+  };
+
+  const formatTimestamp = (ts: string) => {
+    const d = new Date(ts);
+    return d.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
   };
 
   const handleClick = () => {
@@ -97,94 +107,97 @@ export default function MeterCard({ meter, latestReading, status, onClick }: Met
     }
   };
 
+  const statusConfig = getStatusConfig(status);
   const wifiSignal = getWiFiSignal(latestReading?.wifi_rssi);
 
   return (
     <div
       onClick={handleClick}
-      className="bg-surface border border-border hover:border-teal-accent/40 rounded-3xl p-5 cursor-pointer transition-all duration-300 hover:shadow-md flex flex-col justify-between"
+      className="glass rounded-md p-4 cursor-pointer transition-all duration-300 hover:border-border-hover glow-teal flex flex-col justify-between group"
     >
-      {/* Header - Meter Name, Location, Status */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="font-bold font-display text-text-1 text-md leading-tight">{meter.name}</h3>
-          <p className="text-xs text-text-2 mt-0.5">{meter.location}</p>
-          <p className="text-[10px] text-text-3 font-mono font-bold mt-1 uppercase tracking-wider">{meter.meter_id}</p>
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-text-1 text-sm leading-tight truncate group-hover:text-teal-accent transition-colors">
+            {meter.name}
+          </h3>
+          <p className="text-[11px] text-text-3 mt-0.5 truncate">{meter.location}</p>
+          <p className="text-[9px] text-text-3/60 font-mono mt-1 uppercase tracking-wider">{meter.meter_id}</p>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-2 border border-border rounded-full select-none">
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${getStatusColor(status)}`}
-            aria-label={`Status: ${getStatusText(status)}`}
-          ></span>
-          <span className="text-[9px] text-text-2 font-mono uppercase font-bold tracking-wider">{getStatusText(status)}</span>
+        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-sm border ${statusConfig.bg} shrink-0 ml-2`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+          <span className={`text-[9px] font-mono font-bold uppercase tracking-wider ${statusConfig.text}`}>
+            {statusConfig.label}
+          </span>
         </div>
       </div>
 
-      {/* Electrical Parameters Grid */}
+      {/* Electrical Parameters */}
       {latestReading ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2.5 text-xs">
-            <div className="bg-surface-2 border border-border rounded-2xl p-3">
-              <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Voltage</p>
-              <p className="font-mono font-bold text-text-1 text-base mt-1">
-                {latestReading.voltage.toFixed(1)}<span className="text-xs text-text-3 font-normal ml-0.5">V</span>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            {/* Voltage */}
+            <div className="bg-surface-2 rounded-sm p-2.5">
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Voltage</p>
+              <p className="font-mono font-bold text-text-1 text-base mt-0.5 tabular-nums">
+                {latestReading.voltage.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">V</span>
               </p>
             </div>
             
-            <div className="bg-surface-2 border border-border rounded-2xl p-3">
-              <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Current</p>
-              <p className="font-mono font-bold text-text-1 text-base mt-1">
-                {latestReading.current.toFixed(1)}<span className="text-xs text-text-3 font-normal ml-0.5">A</span>
+            {/* Current */}
+            <div className="bg-surface-2 rounded-sm p-2.5">
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Current</p>
+              <p className="font-mono font-bold text-text-1 text-base mt-0.5 tabular-nums">
+                {latestReading.current.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">A</span>
               </p>
             </div>
             
-            <div className="bg-teal-accent/5 border border-teal-accent/20 rounded-2xl p-3">
-              <p className="text-teal-accent text-[9px] uppercase tracking-wider font-bold font-mono">Active Power</p>
-              <p className="font-mono font-bold text-teal-accent text-base mt-1">
-                {latestReading.active_power.toFixed(1)}<span className="text-xs opacity-75 font-normal ml-0.5">kW</span>
+            {/* Active Power — Accent */}
+            <div className="bg-teal-accent/5 border border-teal-accent/10 rounded-sm p-2.5">
+              <p className="text-teal-accent/70 text-[9px] uppercase tracking-wider font-medium">Active Power</p>
+              <p className="font-mono font-bold text-teal-accent text-base mt-0.5 tabular-nums">
+                {latestReading.active_power.toFixed(1)}<span className="text-[10px] opacity-60 font-normal ml-0.5">kW</span>
               </p>
             </div>
             
-            <div className="bg-surface-2 border border-border rounded-2xl p-3">
-              <p className="text-text-3 text-[9px] uppercase tracking-wider font-bold font-mono">Power Factor</p>
-              <p className="font-mono font-bold text-text-1 text-base mt-1">
+            {/* Power Factor */}
+            <div className="bg-surface-2 rounded-sm p-2.5">
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Power Factor</p>
+              <p className="font-mono font-bold text-text-1 text-base mt-0.5 tabular-nums">
                 {latestReading.power_factor.toFixed(2)}
               </p>
             </div>
           </div>
 
-          {/* ESP32 Device Monitoring Section */}
-          <div className="pt-3.5 border-t border-border">
+          {/* Device Monitoring Row */}
+          <div className="pt-2.5 border-t border-border">
             <div className="grid grid-cols-3 gap-2 text-[10px]">
-              {/* Firmware Version */}
               <div className="flex items-center gap-1.5">
-                <Cpu size={14} className="text-text-3" />
+                <Cpu size={13} className="text-text-3/60" />
                 <div>
-                  <p className="text-text-3 uppercase text-[8px] font-bold font-mono tracking-wider">FW</p>
-                  <p className="font-mono text-text-2 font-bold leading-none mt-0.5">
-                    {latestReading.firmware_version || 'N/A'}
+                  <p className="text-text-3/60 text-[8px] uppercase tracking-wider">FW</p>
+                  <p className="font-mono text-text-3 font-medium leading-none mt-0.5">
+                    {latestReading.firmware_version || '—'}
                   </p>
                 </div>
               </div>
 
-              {/* Uptime */}
               <div className="flex items-center gap-1.5">
-                <Clock size={14} className="text-text-3" />
+                <Clock size={13} className="text-text-3/60" />
                 <div>
-                  <p className="text-text-3 uppercase text-[8px] font-bold font-mono tracking-wider">Uptime</p>
-                  <p className="font-mono text-text-2 font-bold leading-none mt-0.5">
-                    {latestReading.uptime_seconds ? formatUptime(latestReading.uptime_seconds) : 'N/A'}
+                  <p className="text-text-3/60 text-[8px] uppercase tracking-wider">Uptime</p>
+                  <p className="font-mono text-text-3 font-medium leading-none mt-0.5">
+                    {latestReading.uptime_seconds ? formatUptime(latestReading.uptime_seconds) : '—'}
                   </p>
                 </div>
               </div>
 
-              {/* WiFi Signal */}
               <div className="flex items-center gap-1.5">
-                <wifiSignal.Icon size={14} className={wifiSignal.color} />
+                <wifiSignal.Icon size={13} className={wifiSignal.color + '/60'} />
                 <div>
-                  <p className="text-text-3 uppercase text-[8px] font-bold font-mono tracking-wider">Signal</p>
-                  <p className={`font-mono font-bold leading-none mt-0.5 ${wifiSignal.color}`}>
-                    {latestReading.wifi_rssi ? `${latestReading.wifi_rssi} dB` : 'N/A'}
+                  <p className="text-text-3/60 text-[8px] uppercase tracking-wider">Signal</p>
+                  <p className={`font-mono font-medium leading-none mt-0.5 ${wifiSignal.color}/80`}>
+                    {latestReading.wifi_rssi ? `${latestReading.wifi_rssi} dB` : '—'}
                   </p>
                 </div>
               </div>
@@ -192,16 +205,16 @@ export default function MeterCard({ meter, latestReading, status, onClick }: Met
           </div>
         </div>
       ) : (
-        <div className="text-center text-text-3 font-mono text-[10px] uppercase font-bold py-6 bg-surface-2 border border-border rounded-2xl">
+        <div className="text-center text-text-3 font-mono text-[10px] uppercase font-medium py-6 bg-surface-2 rounded-sm tracking-wider">
           No telemetry stream
         </div>
       )}
 
-      {/* Footer - Last Update Timestamp */}
+      {/* Footer Timestamp */}
       {latestReading && (
-        <div className="mt-3.5 pt-3 border-t border-border text-[9px] font-mono text-text-3 flex items-center justify-between">
-          <span>LAST BEAT</span>
-          <span className="font-bold">{new Date(latestReading.timestamp).toLocaleString()}</span>
+        <div className="mt-3 pt-2.5 border-t border-border text-[9px] font-mono text-text-3/60 flex items-center justify-between">
+          <span className="uppercase tracking-wider">Last Beat</span>
+          <span className="text-text-3 tabular-nums">{formatTimestamp(latestReading.timestamp)}</span>
         </div>
       )}
     </div>

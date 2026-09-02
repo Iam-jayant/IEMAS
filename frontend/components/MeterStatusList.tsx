@@ -96,22 +96,22 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'online':
-        return 'text-green-500';
+        return 'text-teal-accent';
       case 'offline':
-        return 'text-red-500';
+        return 'text-red-accent';
       default:
-        return 'text-gray-500';
+        return 'text-text-3';
     }
   };
 
   const getStatusBgColor = (status: string) => {
     switch (status) {
       case 'online':
-        return 'bg-green-500';
+        return 'bg-teal-accent';
       case 'offline':
-        return 'bg-red-500';
+        return 'bg-red-accent/100';
       default:
-        return 'bg-gray-500';
+        return 'bg-surface-20';
     }
   };
 
@@ -139,7 +139,7 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   };
 
   const getSignalQuality = (rssi?: number) => {
-    if (!rssi) return { quality: 'Unknown', color: 'text-gray-500', bars: 0 };
+    if (!rssi) return { quality: 'Unknown', color: 'text-text-3', bars: 0 };
     
     // WiFi signal strength interpretation
     // Excellent: -50 dBm and higher (closer to 0)
@@ -148,11 +148,11 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
     // Weak: -80 dBm to -71 dBm
     // Very Weak: -90 dBm and lower
     
-    if (rssi >= -50) return { quality: 'Excellent', color: 'text-green-600', bars: 5 };
-    if (rssi >= -60) return { quality: 'Good', color: 'text-green-500', bars: 4 };
+    if (rssi >= -50) return { quality: 'Excellent', color: 'text-teal-accent', bars: 5 };
+    if (rssi >= -60) return { quality: 'Good', color: 'text-teal-accent', bars: 4 };
     if (rssi >= -70) return { quality: 'Fair', color: 'text-yellow-600', bars: 3 };
-    if (rssi >= -80) return { quality: 'Weak', color: 'text-orange-500', bars: 2 };
-    return { quality: 'Very Weak', color: 'text-red-500', bars: 1 };
+    if (rssi >= -80) return { quality: 'Weak', color: 'text-amber-accent', bars: 2 };
+    return { quality: 'Very Weak', color: 'text-red-accent', bars: 1 };
   };
 
   const SignalStrengthBars = ({ rssi }: { rssi?: number }) => {
@@ -188,12 +188,12 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   // Loading state
   if (isLoading) {
     return (
-      <div className={`bg-white border-2 border-gray-200 rounded-lg p-6 ${className}`}>
+      <div className={`glass rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
-          <Activity className="text-gray-400" size={24} />
-          <h3 className="text-lg font-semibold text-gray-900">Meter Status</h3>
+          <Activity className="text-text-3" size={24} />
+          <h3 className="text-lg font-semibold text-text-1">Meter Status</h3>
         </div>
-        <div className="text-gray-500 text-sm">Loading meter statuses...</div>
+        <div className="text-text-3 text-sm">Loading meter statuses...</div>
       </div>
     );
   }
@@ -201,12 +201,12 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   // Error state
   if (error) {
     return (
-      <div className={`bg-white border-2 border-red-500 rounded-lg p-6 ${className}`}>
+      <div className={`glass border border-red-accent/40 rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
-          <Activity className="text-red-500" size={24} />
-          <h3 className="text-lg font-semibold text-gray-900">Meter Status</h3>
+          <Activity className="text-red-accent" size={24} />
+          <h3 className="text-lg font-semibold text-text-1">Meter Status</h3>
         </div>
-        <div className="flex items-center gap-2 text-red-600">
+        <div className="flex items-center gap-2 text-red-accent">
           <AlertCircle size={20} />
           <span className="text-sm">Failed to load meter statuses</span>
         </div>
@@ -217,12 +217,12 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   // Empty state
   if (meterStatuses.length === 0) {
     return (
-      <div className={`bg-white border-2 border-gray-200 rounded-lg p-6 ${className}`}>
+      <div className={`glass rounded-md p-6 ${className}`}>
         <div className="flex items-center gap-3 mb-4">
-          <Activity className="text-gray-400" size={24} />
-          <h3 className="text-lg font-semibold text-gray-900">Meter Status</h3>
+          <Activity className="text-text-3" size={24} />
+          <h3 className="text-lg font-semibold text-text-1">Meter Status</h3>
         </div>
-        <div className="text-center py-8 text-gray-500 text-sm">
+        <div className="text-center py-8 text-text-3 text-sm">
           No meters registered yet
         </div>
       </div>
@@ -230,26 +230,26 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
   }
 
   return (
-    <div className={`bg-white border-2 border-gray-200 rounded-lg p-6 ${className}`}>
+    <div className={`glass rounded-md p-6 ${className}`}>
       {/* Header with summary counts */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Activity className="text-gray-700" size={24} />
-          <h3 className="text-lg font-semibold text-gray-900">Meter Status</h3>
+          <Activity className="text-text-2" size={24} />
+          <h3 className="text-lg font-semibold text-text-1">Meter Status</h3>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500"></span>
-            <span className="text-gray-600">{onlineMeters.length} Online</span>
+            <span className="w-2 h-2 rounded-full bg-teal-accent"></span>
+            <span className="text-text-2">{onlineMeters.length} Online</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
-            <span className="text-gray-600">{offlineMeters.length} Offline</span>
+            <span className="w-2 h-2 rounded-full bg-red-accent/100"></span>
+            <span className="text-text-2">{offlineMeters.length} Offline</span>
           </span>
           {unknownMeters.length > 0 && (
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-gray-500"></span>
-              <span className="text-gray-600">{unknownMeters.length} Unknown</span>
+              <span className="w-2 h-2 rounded-full bg-surface-20"></span>
+              <span className="text-text-2">{unknownMeters.length} Unknown</span>
             </span>
           )}
         </div>
@@ -262,10 +262,10 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
             key={meterStatus.meter.meter_id}
             className={`p-4 border-l-4 ${
               meterStatus.status === 'online'
-                ? 'border-l-green-500 bg-green-50'
+                ? 'border-l-green-500 bg-teal-accent/10'
                 : meterStatus.status === 'offline'
-                ? 'border-l-red-500 bg-red-50'
-                : 'border-l-gray-500 bg-gray-50'
+                ? 'border-l-red-500 bg-red-accent/10'
+                : 'border-l-gray-500 bg-surface-2'
             } rounded`}
           >
             <div className="flex items-start justify-between">
@@ -276,18 +276,18 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
                     {getStatusIcon(meterStatus.status)}
                   </span>
                   <div>
-                    <h4 className="font-semibold text-gray-900">{meterStatus.meter.name}</h4>
-                    <p className="text-xs text-gray-600">{meterStatus.meter.location}</p>
-                    <p className="text-xs text-gray-500 font-mono mt-1">{meterStatus.meter.meter_id}</p>
+                    <h4 className="font-semibold text-text-1">{meterStatus.meter.name}</h4>
+                    <p className="text-xs text-text-2">{meterStatus.meter.location}</p>
+                    <p className="text-xs text-text-3 font-mono mt-1">{meterStatus.meter.meter_id}</p>
                   </div>
                 </div>
 
                 {/* Last Reading Time */}
-                <div className="flex items-center gap-2 text-xs text-gray-600 ml-9">
+                <div className="flex items-center gap-2 text-xs text-text-2 ml-9">
                   <Clock size={14} />
                   <span>Last reading: {getLastSeenText(meterStatus)}</span>
                   {meterStatus.lastReading && (
-                    <span className="font-mono text-gray-500">
+                    <span className="font-mono text-text-3">
                       ({new Date(meterStatus.lastReading.timestamp).toLocaleString()})
                     </span>
                   )}
@@ -295,28 +295,28 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
 
                 {/* ESP32 Device Info (optional) - Requirement 10.5, 10.6 */}
                 {showDeviceInfo && meterStatus.lastReading && (
-                  <div className="mt-3 ml-9 p-3 bg-gray-100 border border-gray-300 rounded">
-                    <p className="text-xs font-semibold text-gray-700 mb-2">ESP32 Device Metrics</p>
+                  <div className="mt-3 ml-9 p-3 bg-surface-2 border border-border rounded">
+                    <p className="text-xs font-semibold text-text-2 mb-2">ESP32 Device Metrics</p>
                     <div className="grid grid-cols-3 gap-3 text-xs">
                       {meterStatus.lastReading.firmware_version && (
                         <div>
-                          <span className="text-gray-500">Firmware: </span>
-                          <span className="font-mono text-gray-700">
+                          <span className="text-text-3">Firmware: </span>
+                          <span className="font-mono text-text-2">
                             v{meterStatus.lastReading.firmware_version}
                           </span>
                         </div>
                       )}
                       {meterStatus.lastReading.uptime_seconds !== undefined && (
                         <div>
-                          <span className="text-gray-500">Uptime: </span>
-                          <span className="font-mono text-gray-700">
+                          <span className="text-text-3">Uptime: </span>
+                          <span className="font-mono text-text-2">
                             {formatUptime(meterStatus.lastReading.uptime_seconds)}
                           </span>
                         </div>
                       )}
                       {meterStatus.lastReading.wifi_rssi !== undefined && (
                         <div>
-                          <span className="text-gray-500">Signal: </span>
+                          <span className="text-text-3">Signal: </span>
                           <div className="inline-flex items-center gap-2">
                             <SignalStrengthBars rssi={meterStatus.lastReading.wifi_rssi} />
                             <span className={`font-mono ${getSignalQuality(meterStatus.lastReading.wifi_rssi).color}`}>
@@ -330,7 +330,7 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
                       )}
                     </div>
                     {!meterStatus.lastReading.firmware_version && !meterStatus.lastReading.uptime_seconds && !meterStatus.lastReading.wifi_rssi && (
-                      <p className="text-xs text-gray-500 italic">No device metrics available</p>
+                      <p className="text-xs text-text-3 italic">No device metrics available</p>
                     )}
                   </div>
                 )}
@@ -341,10 +341,10 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
                 <span
                   className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${
                     meterStatus.status === 'online'
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-green-100 text-teal-accent'
                       : meterStatus.status === 'offline'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-gray-100 text-gray-700'
+                      ? 'bg-red-100 text-red-accent'
+                      : 'bg-surface-2 text-text-2'
                   }`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${getStatusBgColor(meterStatus.status)}`}></span>
@@ -357,7 +357,7 @@ export default function MeterStatusList({ className = '', showDeviceInfo = false
       </div>
 
       {/* Footer - Auto-refresh notice */}
-      <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 text-center">
+      <div className="mt-4 pt-4 border-t border-border text-xs text-text-3 text-center">
         Auto-refreshing every 5 seconds • Meters offline after 5 minutes without data
       </div>
     </div>
