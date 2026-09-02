@@ -193,15 +193,15 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-600">Loading settings...</div>
+        <div className="text-text-2">Loading settings...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-red-700">
+      <div className="bg-red-accent/10 border border-red-accent/20 rounded-md p-4">
+        <div className="flex items-center gap-2 text-red-accent">
           <AlertTriangle size={20} />
           <span>{error}</span>
         </div>
@@ -213,16 +213,16 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-text-1">System Settings</h1>
+        <p className="text-text-2 mt-1">
           Configure alert thresholds for each meter
         </p>
       </div>
 
       {/* Info Panel */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-4">
         <div className="flex gap-3">
-          <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={20} />
+          <Info className="text-blue-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="text-sm text-blue-900">
             <p className="font-medium mb-1">About Threshold Configuration</p>
             <ul className="space-y-1 text-blue-800">
@@ -241,12 +241,12 @@ export default function SettingsPage() {
 
       {/* Meters Configuration */}
       {meterConfigs.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <SettingsIcon size={48} className="mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="glass rounded-md p-12 text-center">
+          <SettingsIcon size={48} className="mx-auto text-text-3 mb-4" />
+          <h3 className="text-lg font-semibold text-text-1 mb-2">
             No meters registered
           </h3>
-          <p className="text-gray-600">
+          <p className="text-text-2">
             Register meters to configure their threshold settings
           </p>
         </div>
@@ -255,14 +255,14 @@ export default function SettingsPage() {
           {meterConfigs.map((config) => (
             <div
               key={config.meter.meter_id}
-              className="bg-white border border-gray-200 rounded-lg p-6"
+              className="glass rounded-md p-6"
             >
               {/* Meter Info */}
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-text-1">
                   {config.meter.name}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-2">
                   {config.meter.location} • ID: {config.meter.meter_id}
                 </p>
               </div>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                 <div>
                   <label
                     htmlFor={`high-power-${config.meter.meter_id}`}
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-text-2 mb-2"
                   >
                     High Power Threshold (kW)
                   </label>
@@ -290,10 +290,10 @@ export default function SettingsPage() {
                         e.target.value
                       )
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#019CDF] focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-accent/50 focus:border-transparent"
                     placeholder="e.g., 10000"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text-3 mt-1">
                     Alert when power exceeds this value
                   </p>
                 </div>
@@ -302,7 +302,7 @@ export default function SettingsPage() {
                 <div>
                   <label
                     htmlFor={`low-pf-${config.meter.meter_id}`}
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-text-2 mb-2"
                   >
                     Low Power Factor Threshold
                   </label>
@@ -320,10 +320,10 @@ export default function SettingsPage() {
                         e.target.value
                       )
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#019CDF] focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-accent/50 focus:border-transparent"
                     placeholder="e.g., 0.8"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text-3 mt-1">
                     Alert when power factor falls below this value (0.0 - 1.0)
                   </p>
                 </div>
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   {/* Error Message */}
                   {config.error && (
-                    <div className="flex items-center gap-2 text-red-600 text-sm">
+                    <div className="flex items-center gap-2 text-red-accent text-sm">
                       <AlertTriangle size={16} />
                       <span>{config.error}</span>
                     </div>
@@ -342,7 +342,7 @@ export default function SettingsPage() {
 
                   {/* Success Message */}
                   {config.success && (
-                    <div className="flex items-center gap-2 text-green-600 text-sm">
+                    <div className="flex items-center gap-2 text-teal-accent text-sm">
                       <CheckCircle size={16} />
                       <span>{config.success}</span>
                     </div>
@@ -354,7 +354,7 @@ export default function SettingsPage() {
                   {config.isEditing && (
                     <button
                       onClick={() => handleReset(config.meter.meter_id)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                      className="px-4 py-2 text-text-2 hover:text-text-1 font-medium transition-colors"
                       disabled={config.isSaving}
                     >
                       Reset
@@ -364,10 +364,10 @@ export default function SettingsPage() {
                   <button
                     onClick={() => handleSave(config.meter.meter_id)}
                     disabled={!config.isEditing || config.isSaving}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors ${
                       config.isEditing && !config.isSaving
-                        ? 'bg-[#019CDF] hover:bg-[#0284C7] text-white'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        ? 'bg-teal-accent text-bg hover:bg-[#0284C7] text-white'
+                        : 'border-border text-text-3 cursor-not-allowed'
                     }`}
                   >
                     <Save size={18} />
@@ -379,7 +379,7 @@ export default function SettingsPage() {
               {/* Last Updated */}
               {config.threshold.updated_at && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-text-3">
                     Last updated:{' '}
                     {new Date(config.threshold.updated_at).toLocaleString()}
                   </p>
