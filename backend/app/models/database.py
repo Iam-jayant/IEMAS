@@ -35,8 +35,23 @@ class MeterReading(Base):
     id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
     meter_id = Column(String(50), ForeignKey("meters.meter_id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(TIMESTAMP, nullable=False, index=True)
-    voltage = Column(Float, nullable=False)
-    current = Column(Float, nullable=False)
+    # Currents
+    current_r = Column(Float, nullable=False)
+    current_y = Column(Float, nullable=False)
+    current_b = Column(Float, nullable=False)
+    current_avg = Column(Float, nullable=False)
+    
+    # Voltages Line-to-Line
+    voltage_ry = Column(Float, nullable=False)
+    voltage_yb = Column(Float, nullable=False)
+    voltage_br = Column(Float, nullable=False)
+    voltage_ll_avg = Column(Float, nullable=False)
+    
+    # Voltages Line-to-Neutral
+    voltage_rn = Column(Float, nullable=False)
+    voltage_yn = Column(Float, nullable=False)
+    voltage_bn = Column(Float, nullable=False)
+    voltage_ln_avg = Column(Float, nullable=False)
     active_power = Column(Float, nullable=False)
     reactive_power = Column(Float, nullable=False)
     apparent_power = Column(Float, nullable=False)
