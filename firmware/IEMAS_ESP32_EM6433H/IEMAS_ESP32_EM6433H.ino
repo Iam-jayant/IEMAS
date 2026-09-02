@@ -3,6 +3,8 @@
 #include <ArduinoJson.h>
 #include <ModbusMaster.h>
 #include <time.h>
+#include <SPI.h>
+#include <SD.h>
 
 const char* WIFI_SSID     = "pattagobi";
 const char* WIFI_PASSWORD = "12345@678";
@@ -30,6 +32,9 @@ const unsigned long COLLECTION_INTERVAL_MS = 10000;
 #define SLAVE_ID        3
 #define STATUS_LED      2   // Built-in LED on most ESP32 boards
 
+// SD Card CS Pin (Standard VSPI CS is 5 for ESP32)
+#define SD_CS_PIN       5
+
 // ================================================================
 // 3. SCHNEIDER EM6433H / EM64XXH MODBUS HOLDING REGISTERS
 // Note: ModbusMaster Address = Schneider Register Address - 1
@@ -50,6 +55,7 @@ const unsigned long COLLECTION_INTERVAL_MS = 10000;
 // Global Instances
 ModbusMaster node;
 unsigned long lastCollectionTime = 0;
+bool sdCardPresent = false;
 
 // Transceiver Direction Callbacks
 void preTransmission() {
@@ -110,7 +116,38 @@ void checkWiFiConnection() {
   }
 }
 
+// Initialize SD Card
+void initSDCard() {
+  Serial.print("[SD] Initializing SD card...");
+  if (!SD.begin(SD_CS_PIN)) {
+    Serial.println(" Initialization failed!");
+    sdCardPresent = false;
+    return;
+  }
+  Serial.println(" Initialization done.");
+  sdCardPresent = true;
+}
 
+// Save payload to local SD card
+void saveToSD(const String& payload) {
+  if (!sdCardPresent) {
+    Serial.println("[SD] SD card not present, skipping local save.");
+    return;
+  }
+
+  // Open file in append mode. Storing as JSON Lines (.jsonl)
+  File dataFile = SD.open("/readings.jsonl", FILE_APPEND);
+  
+  if (dataFile) {
+    dataFile.println(payload);
+    dataFile.close();
+    Serial.println("[SD] Successfully saved data locally.");
+  } else {
+    Serial.println("[SD] Error opening readings.jsonl for writing.");
+    // Attempt reinitialization in case card was temporarily disconnected
+    initSDCard(); 
+  }
+}
 
 // Transmit JSON payload to IEMAS FastAPI backend with exponential backoff
 bool transmitToBackend(const String& payload) {
@@ -186,10 +223,11 @@ void setup() {
   Serial.printf("[MODBUS] Initialized on RX:%d, TX:%d, RE:%d, DE:%d | 9600 8-E-1 | Slave ID: %d\n",
                 RX_PIN, TX_PIN, MAX485_RE_PIN, MAX485_DE_PIN, SLAVE_ID);
 
+  // Initialize SD Card
+  initSDCard();
+
   // Connect to WiFi
   checkWiFiConnection();
-
-
 }
 
 // ================================================================
@@ -288,7 +326,10 @@ void loop() {
     String jsonPayload;
     serializeJson(doc, jsonPayload);
 
-    // Transmit to FastAPI Backend
+    // 1. Save locally to SD card first
+    saveToSD(jsonPayload);
+
+    // 2. Transmit to FastAPI Backend
     Serial.println("\n[HTTP] Transmitting payload to IEMAS backend...");
     bool ok = transmitToBackend(jsonPayload);
     if (ok) {
