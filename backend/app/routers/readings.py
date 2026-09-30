@@ -76,8 +76,8 @@ async def create_reading(
             if settings.AUTO_REGISTER_METERS:
                 meter = Meter(
                     meter_id=reading.meter_id,
-                    name=f"Schneider Meter {reading.meter_id}",
-                    location="PMCC / Factory Floor",
+                    name=reading.name or f"Meter {reading.meter_id}",
+                    location=reading.location or "Shopfloor Panel",
                     modbus_config={"type": "RTU", "auto_registered": True}
                 )
                 db.add(meter)
@@ -106,6 +106,9 @@ async def create_reading(
             voltage_bn=reading.voltage_bn,
             voltage_ln_avg=reading.voltage_ln_avg,
             active_power=reading.active_power,
+            line1_power=reading.line1_power or 0,
+            line2_power=reading.line2_power or 0,
+            line3_power=reading.line3_power or 0,
             reactive_power=reading.reactive_power,
             apparent_power=reading.apparent_power,
             power_factor=reading.power_factor,
@@ -344,7 +347,8 @@ async def export_readings_csv(
             'Current R (A)', 'Current Y (A)', 'Current B (A)', 'Current Avg (A)',
             'Voltage R-Y (V)', 'Voltage Y-B (V)', 'Voltage B-R (V)', 'Voltage L-L Avg (V)',
             'Voltage R-N (V)', 'Voltage Y-N (V)', 'Voltage B-N (V)', 'Voltage L-N Avg (V)', 
-            'Active Power (kW)', 'Reactive Power (kVAR)', 'Apparent Power (kVA)',
+            'Active Power (kW)', 'Line1 Power (kW)', 'Line2 Power (kW)', 'Line3 Power (kW)',
+            'Reactive Power (kVAR)', 'Apparent Power (kVA)',
             'Power Factor', 'Frequency (Hz)', 'Cumulative Energy (kWh)',
             'Firmware Version', 'Uptime (s)', 'WiFi RSSI (dBm)', 'Created At'
         ])
@@ -368,6 +372,9 @@ async def export_readings_csv(
                 reading.voltage_bn,
                 reading.voltage_ln_avg,
                 reading.active_power,
+                getattr(reading, 'line1_power', 0) or 0,
+                getattr(reading, 'line2_power', 0) or 0,
+                getattr(reading, 'line3_power', 0) or 0,
                 reading.reactive_power,
                 reading.apparent_power,
                 reading.power_factor,
@@ -466,6 +473,9 @@ async def export_readings_json(
                 "voltage_bn": reading.voltage_bn,
                 "voltage_ln_avg": reading.voltage_ln_avg,
                 "active_power": reading.active_power,
+                "line1_power": getattr(reading, 'line1_power', 0) or 0,
+                "line2_power": getattr(reading, 'line2_power', 0) or 0,
+                "line3_power": getattr(reading, 'line3_power', 0) or 0,
                 "reactive_power": reading.reactive_power,
                 "apparent_power": reading.apparent_power,
                 "power_factor": reading.power_factor,

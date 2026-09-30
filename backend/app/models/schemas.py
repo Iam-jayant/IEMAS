@@ -29,11 +29,17 @@ class MeterReadingCreate(BaseModel):
     voltage_bn: float = Field(..., ge=0, description="Voltage B-N (V)")
     voltage_ln_avg: float = Field(..., ge=0, description="Average L-N Voltage (V)")
     active_power: float = Field(..., ge=0, description="Active power in kW (≥0)")
+    line1_power: Optional[float] = Field(default=0, ge=0, description="Line 1 individual power in kW (Multispan)")
+    line2_power: Optional[float] = Field(default=0, ge=0, description="Line 2 individual power in kW (Multispan)")
+    line3_power: Optional[float] = Field(default=0, ge=0, description="Line 3 individual power in kW (Multispan)")
     reactive_power: float = Field(..., description="Reactive power in kVAR")
     apparent_power: float = Field(..., ge=0, description="Apparent power in kVA (≥0)")
     power_factor: float = Field(..., ge=-1, le=1, description="Power factor (-1 to 1)")
     frequency: float = Field(..., ge=0, le=100, description="Frequency in Hz (0-100)")
     cumulative_energy: float = Field(..., ge=0, description="Cumulative energy in kWh (≥0)")
+    # Optional fields from firmware payload (used for auto-registration)
+    name: Optional[str] = Field(None, max_length=255, description="Meter display name (from firmware)")
+    location: Optional[str] = Field(None, max_length=255, description="Physical location (from firmware)")
     firmware_version: Optional[str] = Field(None, max_length=50, description="ESP32 firmware version")
     uptime_seconds: Optional[int] = Field(None, ge=0, description="ESP32 uptime in seconds")
     wifi_rssi: Optional[int] = Field(None, ge=-100, le=0, description="WiFi signal strength in dBm")
@@ -56,6 +62,9 @@ class MeterReadingCreate(BaseModel):
                 "voltage_bn": 240.8,
                 "voltage_ln_avg": 240.2,
                 "active_power": 7.5,
+                "line1_power": 2.4,
+                "line2_power": 2.6,
+                "line3_power": 2.5,
                 "reactive_power": 2.1,
                 "apparent_power": 7.8,
                 "power_factor": 0.98,
