@@ -28,9 +28,14 @@ interface MeterReading {
   voltage_bn: number;
   voltage_ln_avg: number;
   active_power: number;
+  line1_power: number;
+  line2_power: number;
+  line3_power: number;
+  reactive_power: number;
+  apparent_power: number;
   power_factor: number;
   frequency: number;
-  cumulative_energy?: number;
+  cumulative_energy: number;
 }
 
 interface MeterWithStatus extends Meter {

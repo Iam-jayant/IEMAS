@@ -33,8 +33,14 @@ interface MeterReading {
   voltage_bn: number;
   voltage_ln_avg: number;
   active_power: number;
+  line1_power: number;
+  line2_power: number;
+  line3_power: number;
+  reactive_power: number;
+  apparent_power: number;
   power_factor: number;
   frequency: number;
+  cumulative_energy: number;
   firmware_version?: string;
   uptime_seconds?: number;
   wifi_rssi?: number;
@@ -178,6 +184,34 @@ export default function MeterCard({ meter, latestReading, status, onClick }: Met
               </p>
             </div>
           </div>
+
+          {/* Line Power Breakdown (Multispan) or Energy */}
+          {(latestReading.line1_power > 0 || latestReading.line2_power > 0 || latestReading.line3_power > 0) ? (
+            <div className="bg-surface-2 rounded-sm p-2.5">
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium mb-1.5">Line Power (kW)</p>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="text-center">
+                  <p className="text-[8px] text-red-accent/70 uppercase font-mono">L1</p>
+                  <p className="font-mono font-bold text-text-1 text-sm tabular-nums">{latestReading.line1_power.toFixed(1)}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[8px] text-amber-accent/70 uppercase font-mono">L2</p>
+                  <p className="font-mono font-bold text-text-1 text-sm tabular-nums">{latestReading.line2_power.toFixed(1)}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[8px] text-blue-500/70 uppercase font-mono">L3</p>
+                  <p className="font-mono font-bold text-text-1 text-sm tabular-nums">{latestReading.line3_power.toFixed(1)}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-surface-2 rounded-sm p-2.5">
+              <p className="text-text-3 text-[9px] uppercase tracking-wider font-medium">Energy</p>
+              <p className="font-mono font-bold text-text-1 text-sm mt-0.5 tabular-nums">
+                {latestReading.cumulative_energy.toFixed(1)}<span className="text-[10px] text-text-3 font-normal ml-0.5">kWh</span>
+              </p>
+            </div>
+          )}
 
           {/* Device Monitoring Row */}
           <div className="pt-2.5 border-t border-border">

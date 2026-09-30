@@ -34,16 +34,29 @@ import {
  * IEMAS - Analytics Dashboard Page
  *
  * Aggregated energy analytics built from /api/readings/latest data.
- * Displays KPI cards, consumption trends, power distribution, and meter comparisons.
+ * Supports both Schneider (phase-wise voltage/current) and Multispan (line power) meters.
  */
 
 interface Reading {
   id: number;
   meter_id: string;
   timestamp: string;
-  voltage: number;
-  current: number;
+  current_r: number;
+  current_y: number;
+  current_b: number;
+  current_avg: number;
+  voltage_ry: number;
+  voltage_yb: number;
+  voltage_br: number;
+  voltage_ll_avg: number;
+  voltage_rn: number;
+  voltage_yn: number;
+  voltage_bn: number;
+  voltage_ln_avg: number;
   active_power: number;
+  line1_power: number;
+  line2_power: number;
+  line3_power: number;
   reactive_power: number;
   apparent_power: number;
   power_factor: number;
@@ -52,7 +65,7 @@ interface Reading {
 }
 
 // ─── Colour palette ────────────────────────────────────
-const CHART_COLORS = ['#0D9488', '#7C3AED', '#D97706', '#E11D48', '#2563EB', '#059669'];
+const CHART_COLORS = ['#0D9488', '#7C3AED', '#D97706', '#E11D48', '#2563EB', '#059669', '#EC4899', '#F59E0B', '#06B6D4', '#8B5CF6', '#10B981'];
 
 const AREA_GRADIENT_ID = 'areaGradient';
 
@@ -140,20 +153,30 @@ export default function AnalyticsPage() {
     if (!readings.length) return null;
     const totalPower = readings.reduce((s, r) => s + r.active_power, 0);
     const totalEnergy = readings.reduce((s, r) => s + r.cumulative_energy, 0);
-    const avgVoltage = readings.reduce((s, r) => s + r.voltage, 0) / readings.length;
+    const avgVoltage = readings.reduce((s, r) => s + (r.voltage_ll_avg || 0), 0) / readings.length;
     const avgPF = readings.reduce((s, r) => s + r.power_factor, 0) / readings.length;
     const avgFreq = readings.reduce((s, r) => s + r.frequency, 0) / readings.length;
     const peak = readings.reduce((top, r) => (r.active_power > top.active_power ? r : top), readings[0]);
-    return { totalPower, totalEnergy, avgVoltage, avgPF, avgFreq, peak };
+    
+    // Line power totals (Multispan meters)
+    const totalLine1 = readings.reduce((s, r) => s + (r.line1_power || 0), 0);
+    const totalLine2 = readings.reduce((s, r) => s + (r.line2_power || 0), 0);
+    const totalLine3 = readings.reduce((s, r) => s + (r.line3_power || 0), 0);
+    const hasLinePower = totalLine1 > 0 || totalLine2 > 0 || totalLine3 > 0;
+    
+    return { totalPower, totalEnergy, avgVoltage, avgPF, avgFreq, peak, totalLine1, totalLine2, totalLine3, hasLinePower };
   }, [readings]);
 
   // Per-meter bar data
   const meterBars = useMemo(
     () =>
       readings.map((r) => ({
-        meter: r.meter_id,
+        meter: r.meter_id.length > 18 ? r.meter_id.substring(0, 16) + '…' : r.meter_id,
         power: r.active_power,
         energy: r.cumulative_energy,
+        line1: r.line1_power || 0,
+        line2: r.line2_power || 0,
+        line3: r.line3_power || 0,
       })),
     [readings]
   );
@@ -162,7 +185,7 @@ export default function AnalyticsPage() {
   const pieData = useMemo(
     () =>
       readings.map((r) => ({
-        name: r.meter_id,
+        name: r.meter_id.length > 18 ? r.meter_id.substring(0, 16) + '…' : r.meter_id,
         value: r.active_power,
       })),
     [readings]
@@ -223,7 +246,7 @@ export default function AnalyticsPage() {
         />
         <KPICard
           icon={<Gauge className="w-5 h-5" />}
-          label="Avg Voltage"
+          label="Avg Voltage (L-L)"
           value={`${fmtNum(analytics.avgVoltage)} V`}
           accent="amber"
           delta={-0.8}
@@ -236,6 +259,24 @@ export default function AnalyticsPage() {
           delta={+0.2}
         />
       </div>
+
+      {/* ───────── Line Power Summary (Multispan) ───────── */}
+      {analytics.hasLinePower && (
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-red-accent/5 border border-red-accent/15 rounded-md p-5">
+            <p className="text-red-accent/70 text-xs font-bold uppercase tracking-wider">Total Line 1 Power</p>
+            <p className="text-2xl font-bold font-mono text-text-1 mt-1 tabular-nums">{fmtNum(analytics.totalLine1)} <span className="text-sm text-text-3 font-normal">kW</span></p>
+          </div>
+          <div className="bg-amber-accent/5 border border-amber-accent/15 rounded-md p-5">
+            <p className="text-amber-accent/70 text-xs font-bold uppercase tracking-wider">Total Line 2 Power</p>
+            <p className="text-2xl font-bold font-mono text-text-1 mt-1 tabular-nums">{fmtNum(analytics.totalLine2)} <span className="text-sm text-text-3 font-normal">kW</span></p>
+          </div>
+          <div className="bg-blue-500/5 border border-blue-500/15 rounded-md p-5">
+            <p className="text-blue-500/70 text-xs font-bold uppercase tracking-wider">Total Line 3 Power</p>
+            <p className="text-2xl font-bold font-mono text-text-1 mt-1 tabular-nums">{fmtNum(analytics.totalLine3)} <span className="text-sm text-text-3 font-normal">kW</span></p>
+          </div>
+        </div>
+      )}
 
       {/* ───────── Charts Row 1 ───────── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -313,7 +354,7 @@ export default function AnalyticsPage() {
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={meterBars} barSize={36}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="meter" tick={{ fontSize: 11, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="meter" tick={{ fontSize: 9, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} angle={-25} textAnchor="end" height={50} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} unit=" kW" width={55} />
               <Tooltip
                 contentStyle={{
@@ -338,7 +379,7 @@ export default function AnalyticsPage() {
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={meterBars} barSize={36}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="meter" tick={{ fontSize: 11, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="meter" tick={{ fontSize: 9, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} angle={-25} textAnchor="end" height={50} />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} unit=" kWh" width={65} />
               <Tooltip
                 contentStyle={{
@@ -358,6 +399,32 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
+      {/* ───────── Line Power Stacked Bar (Multispan) ───────── */}
+      {analytics.hasLinePower && (
+        <div className="bg-surface border border-border rounded-md p-5">
+          <h3 className="text-sm font-display font-bold text-text-1 mb-4">Line-wise Power Breakdown by Meter</h3>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={meterBars} barSize={36}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="meter" tick={{ fontSize: 9, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} angle={-25} textAnchor="end" height={50} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--text-3)' }} tickLine={false} axisLine={false} unit=" kW" width={55} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 12,
+                  fontSize: 13,
+                }}
+              />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, color: 'var(--text-2)' }} />
+              <Bar dataKey="line1" stackId="lines" fill="#EF4444" name="Line 1" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="line2" stackId="lines" fill="#D97706" name="Line 2" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="line3" stackId="lines" fill="#3B82F6" name="Line 3" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {/* ───────── Meter Detail Table ───────── */}
       <div className="bg-surface border border-border rounded-md p-5 overflow-x-auto">
         <h3 className="text-sm font-display font-bold text-text-1 mb-4">Meter Readings Summary</h3>
@@ -365,21 +432,27 @@ export default function AnalyticsPage() {
           <thead>
             <tr className="border-b border-border text-text-3 text-xs font-mono uppercase tracking-wider">
               <th className="py-3 pr-4">Meter</th>
-              <th className="py-3 pr-4">Voltage</th>
-              <th className="py-3 pr-4">Current</th>
+              <th className="py-3 pr-4">Voltage (L-L)</th>
+              <th className="py-3 pr-4">Current Avg</th>
               <th className="py-3 pr-4">Power</th>
+              <th className="py-3 pr-4">L1</th>
+              <th className="py-3 pr-4">L2</th>
+              <th className="py-3 pr-4">L3</th>
               <th className="py-3 pr-4">PF</th>
               <th className="py-3 pr-4">Freq</th>
               <th className="py-3">Energy</th>
             </tr>
           </thead>
           <tbody>
-            {readings.map((r, i) => (
+            {readings.map((r) => (
               <tr key={r.meter_id} className="border-b border-border/50 last:border-0 hover:bg-surface-2/50 transition-colors">
                 <td className="py-3 pr-4 font-mono font-bold text-text-1 text-xs">{r.meter_id}</td>
-                <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.voltage)} V</td>
-                <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.current)} A</td>
-                <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.active_power)} kW</td>
+                <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.voltage_ll_avg || 0)} V</td>
+                <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.current_avg || 0)} A</td>
+                <td className="py-3 pr-4 font-mono text-text-1 font-semibold">{fmtNum(r.active_power)} kW</td>
+                <td className="py-3 pr-4 font-mono text-red-accent/80">{fmtNum(r.line1_power || 0)}</td>
+                <td className="py-3 pr-4 font-mono text-amber-accent/80">{fmtNum(r.line2_power || 0)}</td>
+                <td className="py-3 pr-4 font-mono text-blue-500/80">{fmtNum(r.line3_power || 0)}</td>
                 <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.power_factor, 2)}</td>
                 <td className="py-3 pr-4 font-mono text-text-2">{fmtNum(r.frequency)} Hz</td>
                 <td className="py-3 font-mono text-text-2">{fmtNum(r.cumulative_energy, 0)} kWh</td>

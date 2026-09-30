@@ -19,9 +19,22 @@ interface Reading {
   id: number
   meter_id: string
   timestamp: string
-  voltage: number
-  current: number
+  current_r: number
+  current_y: number
+  current_b: number
+  current_avg: number
+  voltage_ry: number
+  voltage_yb: number
+  voltage_br: number
+  voltage_ll_avg: number
+  voltage_rn: number
+  voltage_yn: number
+  voltage_bn: number
+  voltage_ln_avg: number
   active_power: number
+  line1_power: number
+  line2_power: number
+  line3_power: number
   reactive_power: number
   apparent_power: number
   power_factor: number
@@ -301,9 +314,12 @@ export default function HistoricalDataPage() {
                   <tr className="text-text-3 text-xs font-mono uppercase tracking-wider">
                     <th className="px-4 py-3.5 text-left font-bold">Timestamp</th>
                     <th className="px-4 py-3.5 text-left font-bold">Meter ID</th>
-                    <th className="px-4 py-3.5 text-right font-bold">Voltage</th>
-                    <th className="px-4 py-3.5 text-right font-bold">Current</th>
+                    <th className="px-4 py-3.5 text-right font-bold">Voltage (L-L)</th>
+                    <th className="px-4 py-3.5 text-right font-bold">Current Avg</th>
                     <th className="px-4 py-3.5 text-right font-bold">Power</th>
+                    <th className="px-4 py-3.5 text-right font-bold">L1</th>
+                    <th className="px-4 py-3.5 text-right font-bold">L2</th>
+                    <th className="px-4 py-3.5 text-right font-bold">L3</th>
                     <th className="px-4 py-3.5 text-right font-bold">PF</th>
                     <th className="px-4 py-3.5 text-right font-bold">Freq</th>
                     <th className="px-4 py-3.5 text-right font-bold">Energy</th>
@@ -325,13 +341,22 @@ export default function HistoricalDataPage() {
                         {reading.meter_id}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono text-text-2">
-                        {fmtNum(reading.voltage, 1)} V
+                        {fmtNum(reading.voltage_ll_avg || 0, 1)} V
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono text-text-2">
-                        {fmtNum(reading.current, 2)} A
+                        {fmtNum(reading.current_avg || 0, 2)} A
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono text-text-1 font-semibold">
                         {fmtNum(reading.active_power, 2)} kW
+                      </td>
+                      <td className="px-4 py-3.5 text-right font-mono text-red-accent/80">
+                        {fmtNum(reading.line1_power || 0, 1)}
+                      </td>
+                      <td className="px-4 py-3.5 text-right font-mono text-amber-accent/80">
+                        {fmtNum(reading.line2_power || 0, 1)}
+                      </td>
+                      <td className="px-4 py-3.5 text-right font-mono text-blue-500/80">
+                        {fmtNum(reading.line3_power || 0, 1)}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono text-text-2">
                         {fmtNum(reading.power_factor, 3)}

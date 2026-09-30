@@ -32,6 +32,9 @@ interface MeterReading {
   voltage_bn: number;
   voltage_ln_avg: number;
   active_power: number;
+  line1_power: number;
+  line2_power: number;
+  line3_power: number;
   reactive_power: number;
   apparent_power: number;
   power_factor: number;
@@ -289,6 +292,27 @@ export default function MeterDetailPage() {
               <p className="text-sm font-bold font-mono text-text-1 mt-1">{latestReading.cumulative_energy.toFixed(2)} kWh</p>
             </div>
           </div>
+
+          {/* Line Power Breakdown (Multispan meters) */}
+          {(latestReading.line1_power > 0 || latestReading.line2_power > 0 || latestReading.line3_power > 0) && (
+            <div className="mt-5">
+              <h3 className="text-xs font-bold font-display text-teal-accent uppercase tracking-wider mb-3">Line-wise Power Breakdown (Multispan)</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-red-accent/5 border border-red-accent/15 rounded-md p-3.5">
+                  <p className="text-red-accent/70 text-[9px] uppercase tracking-wider font-bold font-mono">Line 1 Power</p>
+                  <p className="text-lg font-bold font-mono text-text-1 mt-1 tabular-nums">{latestReading.line1_power.toFixed(2)} <span className="text-[10px] text-text-3 font-normal">kW</span></p>
+                </div>
+                <div className="bg-amber-accent/5 border border-amber-accent/15 rounded-md p-3.5">
+                  <p className="text-amber-accent/70 text-[9px] uppercase tracking-wider font-bold font-mono">Line 2 Power</p>
+                  <p className="text-lg font-bold font-mono text-text-1 mt-1 tabular-nums">{latestReading.line2_power.toFixed(2)} <span className="text-[10px] text-text-3 font-normal">kW</span></p>
+                </div>
+                <div className="bg-blue-500/5 border border-blue-500/15 rounded-md p-3.5">
+                  <p className="text-blue-500/70 text-[9px] uppercase tracking-wider font-bold font-mono">Line 3 Power</p>
+                  <p className="text-lg font-bold font-mono text-text-1 mt-1 tabular-nums">{latestReading.line3_power.toFixed(2)} <span className="text-[10px] text-text-3 font-normal">kW</span></p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
