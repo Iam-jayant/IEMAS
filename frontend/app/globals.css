@@ -30,6 +30,32 @@
   --glass-blur: 20px;
 }
 
+:root.light {
+  /* Industrial Light Palette (Off-white/slate shades) */
+  --bg: #F8FAFC;
+  --surface: rgba(15, 23, 42, 0.03);
+  --surface-2: rgba(15, 23, 42, 0.06);
+  --surface-3: rgba(15, 23, 42, 0.10);
+  --border: rgba(15, 23, 42, 0.12);
+  --border-hover: rgba(15, 23, 42, 0.25);
+
+  /* Accent Colors (Slightly darker for light mode readability) */
+  --teal: #0D9488;
+  --amber: #D97706;
+  --red: #E11D48;
+  --violet: #7C3AED;
+  --orange: #EA580C;
+
+  /* Text Hierarchy (Inverted) */
+  --text-1: #0F172A;
+  --text-2: #334155;
+  --text-3: #64748B;
+
+  /* Glass properties (Light Mode) */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(15, 23, 42, 0.08);
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

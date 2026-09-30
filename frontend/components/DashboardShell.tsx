@@ -17,6 +17,8 @@ import {
   BarChart3,
   Zap,
   ChevronRight,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export default function DashboardShell({
@@ -31,6 +33,27 @@ export default function DashboardShell({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // Initialize theme from local storage
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light') {
+      setTheme('light');
+      document.documentElement.classList.add('light');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  };
 
   // Dynamic backend health check
   const checkHealth = useCallback(async () => {
@@ -242,6 +265,15 @@ export default function DashboardShell({
                 {backendOnline === null ? '...' : backendOnline ? 'ONLINE' : 'OFFLINE'}
               </span>
             </div>
+
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="relative p-2 hover:bg-surface-2 rounded-md text-text-3 hover:text-text-1 transition-all cursor-pointer"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
 
             {/* Notifications */}
             <button className="relative p-2 hover:bg-surface-2 rounded-md text-text-3 hover:text-text-1 transition-all cursor-pointer">
