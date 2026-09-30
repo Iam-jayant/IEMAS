@@ -37,7 +37,7 @@ router = APIRouter()
         500: {"model": ErrorResponse, "description": "Internal server error"}
     }
 )
-async def create_reading(
+def create_reading(
     reading: MeterReadingCreate,
     background_tasks: BackgroundTasks,
     x_device_token: Optional[str] = Header(None, alias="X-Device-Token"),

@@ -148,6 +148,7 @@ bool transmitToBackend(const String& payload) {
 
   for (int attempt = 1; attempt <= maxRetries; attempt++) {
     http.begin(BACKEND_URL);
+    http.setTimeout(15000); // 15 second timeout to handle Render cold starts
     http.addHeader("Content-Type", "application/json");
     if (strlen(DEVICE_TOKEN) > 0) http.addHeader("X-Device-Token", DEVICE_TOKEN);
     
